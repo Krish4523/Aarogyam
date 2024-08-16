@@ -14,6 +14,7 @@ Docker.
 - [Prisma Studio](#prisma-studio)
 - [Docker](#docker)
 - [Scripts](#scripts)
+- [API Documentation](#api-documentation)
 - [License](#license)
 
 ## Requirements
@@ -159,6 +160,10 @@ Here are the available npm scripts:
 - **`lint:fix`**: Fix linting errors with TSLint.
 - **`format`**: Format the code using Prettier.
 - **`format:check`**: Check code formatting with Prettier.
+
+## API Documentation
+
+For detailed API documentation, refer to the [Postman Documentation](https://documenter.getpostman.com/view/30513437/2sA3s7kpdM).
 
 ## License
 
