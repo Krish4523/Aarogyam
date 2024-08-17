@@ -1,0 +1,45 @@
+services:
+  main-service:
+    build:
+      context: ./aarogyam-server
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - BACKEND_URL=${BACKEND_URL}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+    depends_on:
+      - aarogyam-db
+    networks:
+      - app-network
+
+  aarogyam-db:
+    image: postgres:16.0
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "6000:5432"
+    volumes:
+      - aarogyam_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: ./aarogyam-api-gateway/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./aarogyam-api-gateway/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - main-service
+    networks:
+      - app-network
+
+volumes:
+  aarogyam_data:
+
+networks:
+  app-network:
+    driver: bridge
