@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import env from "../configs/env.ts";
+import env from "../configs/env";
 
 /**
  * Interface representing the payload for the JWT.

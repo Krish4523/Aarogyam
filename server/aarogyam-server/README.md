@@ -163,7 +163,8 @@ Here are the available npm scripts:
 
 ## API Documentation
 
-For detailed API documentation, refer to the [Postman Documentation](https://documenter.getpostman.com/view/30513437/2sA3s7kpdM).
+For detailed API documentation, refer to
+the [Postman Documentation](https://documenter.getpostman.com/view/30513437/2sA3s7kpdM).
 
 ## License
 

@@ -43,7 +43,9 @@ export const deleteByUserId = async (userId: number) => {
  * @param token - The verification token string.
  * @returns A promise that resolves to the found verification token, including the associated user.
  */
-export const getByToken = async (token: string): Promise<VerificationToken> => {
+export const getByToken = async (
+  token: string
+): Promise<VerificationToken | null> => {
   return verificationTokenClient.findFirst({
     where: {
       token: {

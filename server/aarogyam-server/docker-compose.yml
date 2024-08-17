@@ -10,6 +10,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
       - BACKEND_URL=${BACKEND_URL}
+      - BREVO_API_KEY=${BREVO_API_KEY}
     depends_on:
       - aarogyam-db
     networks:

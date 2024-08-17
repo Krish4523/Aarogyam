@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import cookieParser from "cookie-parser";
-import errorMiddleware from "./middlewares/error.middleware.ts";
-import authRouter from "./routers/auth.router.ts";
-import userRouter from "./routers/user.router.ts";
+import errorMiddleware from "./middlewares/error.middleware";
+import authRouter from "./routers/auth.router";
+import userRouter from "./routers/user.router";
 
 const app = express();
 
@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/api/main_service", (req: Request, res: Response) => {
   res.status(200).send("MAIN SERVICE RUNNING");
 });
 

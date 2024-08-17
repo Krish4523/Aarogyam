@@ -44,7 +44,8 @@
     // Enable incremental compilation for faster rebuilds.
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "prisma/**/*"
   ],
   // Include all TypeScript files under the src directory.
   "exclude": [

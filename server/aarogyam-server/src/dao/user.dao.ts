@@ -13,7 +13,7 @@ const userClient = new PrismaClient().user;
 export const findByEmailOrPhone = async (
   email: string | null,
   phone: string | null
-): Promise<User> => {
+): Promise<User | null> => {
   return userClient.findFirst({
     where: {
       OR: [{ email: email || undefined }, { phone: phone || undefined }],

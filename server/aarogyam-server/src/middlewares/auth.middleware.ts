@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 import Format from "../utils/format";
 import env from "../configs/env";
 import * as userDao from "../dao/user.dao";
-import { Payload } from "../utils/generateAccessToken";
-import { SafeUser } from "../types/user";
+import { NextFunction, Request, Response } from "express";
 
 /**
  * Middleware to verify the JWT token from the request.
@@ -13,7 +12,11 @@ import { SafeUser } from "../types/user";
  * @param next - The next middleware function.
  * @returns A promise that resolves to the next middleware function.
  */
-export const verifyJWT = async (req, _, next) => {
+export const verifyJWT = async (
+  req: Request,
+  _: Response,
+  next: NextFunction
+) => {
   try {
     // Extract the token from cookies or Authorization header
     const token =
@@ -24,10 +27,10 @@ export const verifyJWT = async (req, _, next) => {
     if (!token) Format.unAuthorized("Token not found");
 
     // Verify the token and extract the payload
-    const { id }: Payload = await jwt.verify(token, env.JWT_SECRET);
+    const { id }: any = await jwt.verify(token, env.JWT_SECRET);
 
     // Find the user by ID from the payload
-    const user: SafeUser = await userDao.findByID(id);
+    const user: any = await userDao.findByID(id);
 
     // If user is not found, respond with unauthorized error
     if (!user) Format.unAuthorized("Invalid access token");

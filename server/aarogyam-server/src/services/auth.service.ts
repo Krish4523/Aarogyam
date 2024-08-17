@@ -24,7 +24,7 @@ export const loginUser = async (
   phone: string | null,
   password: string
 ): Promise<any> => {
-  const user: User = await userDao.findByEmailOrPhone(email, phone);
+  const user: any = await userDao.findByEmailOrPhone(email, phone);
 
   if (!user) return Format.notFound("User not found");
 
@@ -53,7 +53,7 @@ export const loginUser = async (
 export async function signUp(userSignUp: UserSignUp): Promise<any> {
   const { email, phone, password } = userSignUp;
 
-  const existingUser: User = await userDao.findByEmailOrPhone(email, phone);
+  const existingUser: any = await userDao.findByEmailOrPhone(email, phone);
 
   if (existingUser) return Format.conflict(null, "User already exists");
 
@@ -98,8 +98,7 @@ const sendVerificationMail = async (user: User) => {
  * @returns A promise that resolves to the result of the verification process.
  */
 export async function verifyToken(token: string) {
-  const verificationToken: VerificationToken =
-    await verificationTokenDao.getByToken(token);
+  const verificationToken: any = await verificationTokenDao.getByToken(token);
 
   if (!verificationToken) return Format.notFound("Invalid Verification Token");
 
