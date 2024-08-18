@@ -64,12 +64,12 @@ Aarogyam is a comprehensive healthcare application designed to provide users wit
 
 3. To run only the backend service:
     ```sh
-    docker-compose up --build aarogyam-db main-service nginx
+    docker-compose up --build aarogyam-db main-service api-gateway
     ```
 
 4. To run only the frontend service:
     ```sh
-    docker-compose up --build nextjs-client
+    docker-compose up --build aarogyam-client
     ```
 
 5. To apply database migrations using Prisma:

@@ -1,8 +1,6 @@
 # Aarogyam Healthcare - Aarogyam Server
 
-The Aarogyam Server is a key component of the Aarogyam healthcare application, providing backend services for managing
-healthcare data. This microservice is built with TypeScript, Express, Prisma, and PostgreSQL, and is containerized using
-Docker.
+The Aarogyam Server is a key component of the Aarogyam healthcare application, providing backend services for managing healthcare data. This microservice is built with TypeScript, Express, Prisma, and PostgreSQL, and is containerized using Docker.
 
 ## Table of Contents
 
@@ -12,7 +10,6 @@ Docker.
 - [Usage](#usage)
 - [Database Migration](#database-migration)
 - [Prisma Studio](#prisma-studio)
-- [Docker](#docker)
 - [Scripts](#scripts)
 - [API Documentation](#api-documentation)
 - [License](#license)
@@ -51,37 +48,12 @@ Follow these steps to set up the Aarogyam Server:
 Create a `.env` file in the root directory of the project with the following configuration:
 
 ```env
-# Server Port
-PORT=3000
-
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=6000
-DB_USER=root
-DB_PASS=root
-DB_NAME=aarogyam
-
 # JWT Secret Key
-JWT_SECRET=
-# Generate a new secret key using:
-# $ openssl rand -base64 64
-
-# Database connection string for Prisma
-DATABASE_URL=postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}
-
-# Brevo API Key
+JWT_SECRET= # $ openssl rand -base64 64
+DATABASE_URL= # Database connection string for Prisma
 BREVO_API_KEY=
-
-# Backend URL
-BACKEND_URL=http://localhost:${PORT}
+BACKEND_URL=http://localhost
 ```
-
-- **`PORT`**: The port number on which the server will run.
-- **Database Configuration**: The connection details for the PostgreSQL database.
-- **`JWT_SECRET`**: Secret key used for signing JSON Web Tokens. Generate a new key if not already set.
-- **`DATABASE_URL`**: Connection string for Prisma to connect to the PostgreSQL database.
-- **`BREVO_API_KEY`**: API key for Brevo services.
-- **`BACKEND_URL`**: The URL of the backend service.
 
 ## Usage
 
@@ -117,8 +89,7 @@ To set up the database schema and generate the Prisma client:
 
 ## Prisma Studio
 
-Prisma Studio is a visual editor for managing your database. It allows you to view and interact with your data in a
-user-friendly interface.
+Prisma Studio is a visual editor for managing your database. It allows you to view and interact with your data in a user-friendly interface.
 
 To open Prisma Studio:
 
@@ -126,28 +97,7 @@ To open Prisma Studio:
 npx prisma studio
 ```
 
-This command launches Prisma Studio in your default web browser. You can use it to browse, edit, and manage your
-database records.
-
-## Docker
-
-To run the server and database using Docker, follow these steps:
-
-1. **Start Services**
-
-   ```bash
-   docker-compose up
-   ```
-
-   This command starts both the `main-service` and `aarogyam-db` services defined in the `docker-compose.yml` file.
-
-2. **Stop Services**
-
-   ```bash
-   docker-compose down
-   ```
-
-   This command stops and removes the running containers.
+This command launches Prisma Studio in your default web browser. You can use it to browse, edit, and manage your database records.
 
 ## Scripts
 
@@ -163,8 +113,7 @@ Here are the available npm scripts:
 
 ## API Documentation
 
-For detailed API documentation, refer to
-the [Postman Documentation](https://documenter.getpostman.com/view/30513437/2sA3s7kpdM).
+For detailed API documentation, refer to the [Postman Documentation](https://documenter.getpostman.com/view/30513437/2sA3s7kpdM).
 
 ## License
 
