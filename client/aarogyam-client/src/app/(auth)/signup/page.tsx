@@ -3,13 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import { SignUpSchema } from "@/utils/schemas";
+import { SignUpSchema } from "@/utils/validations/schemas";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -28,13 +27,14 @@ import { Loader2 } from "lucide-react";
 import { submitForm } from "@/utils/submitForm";
 
 interface InputFieldsProps {
-  name: "name" | "email" | "password" | "phone";
+  name: "name" | "email" | "password" | "confirm_password" | "phone";
   placeholder: string;
 }
 const inputFields: InputFieldsProps[] = [
   { name: "name", placeholder: "Name" },
   { name: "email", placeholder: "Email" },
   { name: "password", placeholder: "Password" },
+  { name: "confirm_password", placeholder: "Confirm Password" },
   { name: "phone", placeholder: "Phone No" },
 ];
 
@@ -49,6 +49,7 @@ function SignupPage() {
       name: "",
       email: "",
       password: "",
+      confirm_password: "",
       phone: "",
     },
   });
@@ -93,7 +94,11 @@ function SignupPage() {
                               <FormControl>
                                 <Input
                                   type={
-                                    name !== "password" ? "text" : "password"
+                                    ["password", "confirm_password"].includes(
+                                      name
+                                    )
+                                      ? "password"
+                                      : "text"
                                   }
                                   placeholder={placeholder}
                                   {...field}
@@ -106,32 +111,6 @@ function SignupPage() {
                       </div>
                     )
                   )}
-                  {/*<div className="grid gap-2">
-                    <FormField
-                      control={form.control}
-                      name="profileImage"
-                      render={({
-                        field: { value, onChange, ...fieldProps },
-                      }) => (
-                        <FormItem>
-                          <FormLabel>Profile picture</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              {...fieldProps}
-                              accept="image/png, image/jpeg, image/jpg"
-                              onChange={(event) => {
-                                onChange(
-                                  event.target.files && event.target.files[0]
-                                );
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>*/}
                   {errorMessage && (
                     <div className="text-red-500 text-sm text-center">
                       {errorMessage}

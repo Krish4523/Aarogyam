@@ -4,9 +4,9 @@ import {
   BellDot,
   CalendarDays,
   House,
-  History,
   PillBottle,
   SquareLibrary,
+  MessagesSquare,
 } from "lucide-react";
 import { SidebarItem } from "@/components/SidebarItem";
 import Link from "next/link";
@@ -42,8 +42,8 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
       alert: true,
     },
     {
-      text: "Chat History",
-      icon: <History size={24} />,
+      text: "AI Chats",
+      icon: <MessagesSquare size={24} />,
       href: "/patient/chat-history",
     },
   ];
@@ -51,7 +51,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
   return (
     <main>
       <div className="max-h-screen flex flex-col">
-        <div className="grid grid-cols-[auto,1fr] flex-grow-1 overflow-auto">
+        <div className="sm:grid sm:grid-cols-[auto,1fr] flex-grow-1 overflow-auto pb-[3.5rem] sm:pb-0">
           <Sidebar>
             {sidebarItems.map(({ text, icon, href, alert }) => (
               <Link key={text} href={href} passHref>
@@ -64,9 +64,11 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </Sidebar>
-          <div className="overflow-x-hidden px-8 pb-4">{children}</div>
-          <BottomNav />
+          <div className="overflow-x-hidden px-8 md:px-10 lg:px-16 pb-4">
+            {children}
+          </div>
         </div>
+        <BottomNav />
       </div>
     </main>
   );

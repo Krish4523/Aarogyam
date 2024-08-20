@@ -70,27 +70,27 @@ export default function Sidebar({ children }: { children: ReactNode }) {
           <ul className="flex-1 flex flex-col gap-1 px-4 my-2">{children}</ul>
         </SidebarContext.Provider>
 
-        <div className="border-t flex p-3">
-          <Image
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt="User Avatar"
-            className="w-10 h-10 rounded-md"
-            width={40}
-            height={40}
-          />
-          <div
-            className={`
+        <Link href="/patient/profile">
+          <div className="border-t flex p-3">
+            <img
+              src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+              alt="User Avatar"
+              className="w-10 h-10 rounded-md"
+            />
+            <div
+              className={`
               flex justify-between items-center
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
-          >
-            <div className="leading-4">
-              <h4 className="text-sm font-semibold">John Doe</h4>
-              <span className="text-xs text-gray-600">johndoe@gmail.com</span>
+            >
+              <div className="leading-4">
+                <h4 className="text-sm font-semibold">John Doe</h4>
+                <span className="text-xs text-gray-600">johndoe@gmail.com</span>
+              </div>
+              <MoreVertical size={20} />
             </div>
-            <MoreVertical size={20} />
           </div>
-        </div>
+        </Link>
       </nav>
     </aside>
   );
