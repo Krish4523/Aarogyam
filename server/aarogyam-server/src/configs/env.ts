@@ -5,7 +5,7 @@ const env = dotenv.config();
 
 // Throw an error if there is an issue loading the environment variables
 if (env.error) {
-  throw env.error;
+  console.error(env.error);
 }
 
 /**
