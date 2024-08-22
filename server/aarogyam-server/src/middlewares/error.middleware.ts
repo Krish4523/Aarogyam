@@ -22,7 +22,7 @@ const errorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const status = err.statusCode || 500;
+  const status = err.statusCode || err.code || 500;
   const message = err.message || "Something went wrong";
 
   // Log error details if in development mode
