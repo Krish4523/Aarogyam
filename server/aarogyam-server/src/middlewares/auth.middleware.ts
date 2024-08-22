@@ -24,7 +24,7 @@ export const verifyJWT = async (
       req.header("Authorization")?.replace("Bearer ", "");
 
     // If token is not found, respond with unauthorized error
-    if (!token) Format.unAuthorized("Token not found");
+    if (!token) return Format.unAuthorized("Token not found");
 
     // Verify the token and extract the payload
     const { id }: any = await jwt.verify(token, env.JWT_SECRET);
@@ -33,7 +33,7 @@ export const verifyJWT = async (
     const user: any = await userDao.findByID(id);
 
     // If user is not found, respond with unauthorized error
-    if (!user) Format.unAuthorized("Invalid access token");
+    if (!user) return Format.unAuthorized("Invalid access token");
 
     // Attach the user to the request object
     req.user = user;
