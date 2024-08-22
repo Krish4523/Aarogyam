@@ -22,7 +22,10 @@ const errorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const status = err.statusCode || err.code || 500;
+  let status = err.statusCode || 500;
+  if (status < 100 || status > 599) {
+    status = 500; // default to internal server error for invalid status codes
+  }
   const message = err.message || "Something went wrong";
 
   // Log error details if in development mode

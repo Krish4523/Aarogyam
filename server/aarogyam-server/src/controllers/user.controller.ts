@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "@prisma/client";
 import { SafeUser } from "../types/user";
-
+import path from "path";
 import httpStatus from "../utils/http-status";
 import Format from "../utils/format";
 import * as userService from "../services/user.service";
@@ -40,8 +40,7 @@ export const changePassword = async (
 ): Promise<any> => {
   try {
     const { old_password, password, password_confirmation } = req.body;
-    const userId = parseInt(req.params.id, 10);
-    console.log("userId:", userId);
+    const userId = parseInt(req.params.id, 10); // give user id from url
     if (!password || !password_confirmation || !old_password) {
       res
         .status(httpStatus.BAD_REQUEST)
@@ -51,6 +50,34 @@ export const changePassword = async (
       old_password,
       password,
       password_confirmation,
+      userId
+    );
+    return res.status(result.code).json(result);
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const { name, phoneNumber, address } = req.body;
+    const profileImage = req.file ? req.file.path : null;
+    let relativePath;
+    if (req.file) {
+      relativePath = path.join(".", req.file.filename);
+    } else {
+      relativePath = profileImage;
+    }
+    const result: any = await userService.updateUser(
+      name,
+      phoneNumber,
+      address,
+      relativePath,
       userId
     );
     return res.status(result.code).json(result);

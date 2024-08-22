@@ -25,3 +25,27 @@ export const changePassword = async (
     return Format.badRequest(null, "Passwords do not match");
   }
 };
+
+export const updateUser = async (
+  name: string,
+  phoneNumber: string,
+  address: string,
+  profileImage: string | null,
+  userId: number
+): Promise<any> => {
+  const existingUser = await userDao.findByID(userId);
+  if (!existingUser) {
+    return Format.notFound("User not found");
+  }
+  if (!profileImage) {
+    profileImage = existingUser.profile_image;
+  }
+  await userDao.updateUser(
+    name || existingUser.name,
+    phoneNumber || existingUser.phone,
+    address || existingUser.address,
+    profileImage,
+    userId
+  );
+  return Format.success("User update successfully");
+};

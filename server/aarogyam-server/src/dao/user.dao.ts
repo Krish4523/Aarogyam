@@ -1,6 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
 import { UserSignUp } from "../types/user";
-
 const userClient = new PrismaClient().user;
 
 /**
@@ -106,6 +105,27 @@ export const resetPassword = async (
     },
     data: {
       password: hashedPassword,
+    },
+  });
+};
+
+export const updateUser = async (
+  userName: string,
+  userPhoneNumber: string,
+  userAddress: string | null,
+  userImage: string | null,
+  id: number
+): Promise<User> => {
+  return userClient.update({
+    where: {
+      id,
+    },
+    data: {
+      name: userName,
+      phone: userPhoneNumber,
+      address: userAddress,
+      profile_image: userImage,
+      updated_at: new Date(),
     },
   });
 };
