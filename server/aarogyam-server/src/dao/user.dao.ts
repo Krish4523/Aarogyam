@@ -72,6 +72,40 @@ export const findByID = async (id: number) => {
       isVerified: true,
       created_at: true,
       updated_at: true,
+      password: true,
+    },
+  });
+};
+
+export const updatePassword = async (id: number, newPassword: string) => {
+  return userClient.update({
+    where: {
+      id,
+    },
+    data: {
+      password: newPassword,
+    },
+  });
+};
+
+export const findByEmail = async (email: string | null) => {
+  return userClient.findUnique({
+    where: {
+      email: email || undefined,
+    },
+  });
+};
+
+export const resetPassword = async (
+  hashedPassword: string,
+  id: number
+): Promise<User> => {
+  return userClient.update({
+    where: {
+      id,
+    },
+    data: {
+      password: hashedPassword,
     },
   });
 };

@@ -16,4 +16,6 @@ router.use(verifyJWT);
  */
 router.route("").get(userController.getUser);
 
+router.post("/changePassword/:id", userController.changePassword);
+
 export default router;

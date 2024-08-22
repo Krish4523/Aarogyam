@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as authController from "../controllers/auth.controller";
+// import * as userController from "../controllers/user.controller";
 
 const router: Router = Router();
 
@@ -29,5 +30,9 @@ router.route("/signup").post(authController.signUpController);
  * @controller authController.verifyTokenController
  */
 router.route("/verify/:token").get(authController.verifyTokenController);
+
+router.post("/sendRestPasswordMail/", authController.sendRestPasswordMail);
+
+router.post("/resetPassword/:token", authController.resetPassword);
 
 export default router;
