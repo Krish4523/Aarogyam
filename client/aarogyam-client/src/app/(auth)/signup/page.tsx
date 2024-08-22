@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import { SignUpSchema } from "@/utils/validations/schemas";
+import { SignUpSchema } from "@/utils/validations/AuthSchema";
 import {
   Form,
   FormControl,
@@ -25,11 +25,13 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { submitForm } from "@/utils/submitForm";
+import { useToast } from "@/components/ui/use-toast";
 
 interface InputFieldsProps {
   name: "name" | "email" | "password" | "confirm_password" | "phone";
   placeholder: string;
 }
+
 const inputFields: InputFieldsProps[] = [
   { name: "name", placeholder: "Name" },
   { name: "email", placeholder: "Email" },
@@ -54,17 +56,23 @@ function SignupPage() {
     },
   });
   const router = useRouter();
+  const { toast } = useToast();
 
   async function onSubmit(data: SignUpForm) {
     await submitForm<SignUpForm>({
       data,
       endpoint: "/api/signup",
-      router,
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {
         console.log("Account created successfully:", response);
-        // Additional success logic if needed
+        router.push("/patient");
+      },
+      onError: (error: Error) => {
+        toast({
+          title: "Error",
+          description: `${error}`,
+        });
       },
     });
   }

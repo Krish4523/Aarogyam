@@ -4,9 +4,9 @@ import {
   BellDot,
   CalendarDays,
   House,
+  MessagesSquare,
   PillBottle,
   SquareLibrary,
-  MessagesSquare,
 } from "lucide-react";
 import { SidebarItem } from "@/components/SidebarItem";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
     {
       text: "AI Chats",
       icon: <MessagesSquare size={24} />,
-      href: "/patient/chat-history",
+      href: "/patient/ai-chat",
     },
   ];
 

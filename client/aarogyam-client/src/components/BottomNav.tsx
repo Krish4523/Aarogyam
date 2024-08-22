@@ -3,7 +3,6 @@ import {
   BellDot,
   CalendarDays,
   House,
-  History,
   PillBottle,
   SquareLibrary,
 } from "lucide-react";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FilePenLine, Trash2, UserPlus } from "lucide-react";
@@ -22,8 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { profileFormSchema } from "@/utils/validations/schemas";
-// import { toastReact } from "@/components/ui/toast-react";
+import { profileFormSchema } from "@/utils/validations/ProfileSchema";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 

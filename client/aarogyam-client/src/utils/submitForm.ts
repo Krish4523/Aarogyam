@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { Dispatch, SetStateAction } from "react";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type FormDataKey = string | number | symbol;
 type FormDataRecord = Record<FormDataKey, any>;
@@ -8,7 +7,7 @@ type FormDataRecord = Record<FormDataKey, any>;
 interface SubmitFormOptions<T extends FormDataRecord> {
   data: T;
   endpoint: string;
-  router: AppRouterInstance;
+  // router: AppRouterInstance;
   setLoading: Dispatch<SetStateAction<boolean>>;
   setErrorMessage: Dispatch<SetStateAction<string | null>>;
   onSuccess?: (response: any) => void; // Callback for successful submission
@@ -18,7 +17,7 @@ interface SubmitFormOptions<T extends FormDataRecord> {
 export async function submitForm<T extends FormDataRecord>({
   data,
   endpoint,
-  router,
+  // router,
   setLoading,
   setErrorMessage,
   onSuccess,
@@ -50,7 +49,7 @@ export async function submitForm<T extends FormDataRecord>({
       onSuccess(response.data);
     } else {
       // Default success behavior: redirect to dashboard
-      router.push("/dashboard");
+      // router.push("/dashboard");
     }
   } catch (error) {
     if (error instanceof AxiosError) {

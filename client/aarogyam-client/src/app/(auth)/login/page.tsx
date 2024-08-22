@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { LoginSchema } from "@/utils/validations/schemas";
+import { LoginSchema } from "@/utils/validations/AuthSchema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
@@ -25,6 +25,7 @@ import { submitForm } from "@/utils/submitForm";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 type LoginForm = z.infer<typeof LoginSchema>;
 
@@ -41,6 +42,8 @@ function LoginPage() {
   });
 
   const router = useRouter();
+  const { toast } = useToast();
+
   async function onSubmit(data: LoginForm) {
     const isEmail = z.string().email().safeParse(data.emailOrPhone).success;
 
@@ -53,12 +56,17 @@ function LoginPage() {
     await submitForm({
       data: formData,
       endpoint: "/api/login",
-      router,
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {
         console.log("Account created successfully:", response);
-        // Additional success logic if needed
+        router.push("/patient");
+      },
+      onError: (error: Error) => {
+        toast({
+          title: "Error",
+          description: `${error}`,
+        });
       },
     });
   }
@@ -145,4 +153,5 @@ function LoginPage() {
     </div>
   );
 }
+
 export default LoginPage;
