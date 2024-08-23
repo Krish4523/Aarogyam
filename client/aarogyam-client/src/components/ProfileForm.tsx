@@ -49,6 +49,8 @@ const defaultValues: ProfileFormValues = {
 type ButtonSize = "default" | "sm" | "lg" | "icon" | null | undefined;
 
 export function ProfileForm() {
+  const [isEditable, setIsEditable] = useState(false); // State to manage edit mode
+
   const [imagePreview, setImagePreview] = useState<string | null>(
     defaultValues.profileImage || null
   );
@@ -91,6 +93,8 @@ export function ProfileForm() {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEditable) return; // Prevent image change if not in edit mode
+
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -102,14 +106,19 @@ export function ProfileForm() {
   };
 
   function onSubmit(data: ProfileFormValues) {
-    toast({
-      title: "Profile updated",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    if (!isEditable) {
+      setIsEditable(true);
+    } else {
+      toast({
+        title: "Profile updated",
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      });
+      setIsEditable(false);
+    }
   }
 
   return (
@@ -128,19 +137,21 @@ export function ProfileForm() {
                 alt="Profile Image"
                 className="rounded-full size-32 object-cover border"
               />
-              <label
-                htmlFor="profile-photo"
-                className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-gray-300 shadow-lg cursor-pointer"
-              >
-                <FilePenLine size={16} className="text-primary" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="profile-photo"
-                />
-              </label>
+              {isEditable && ( // Show the edit icon only in edit mode
+                <label
+                  htmlFor="profile-photo"
+                  className="absolute bottom-0 right-0 bg-white p-1 rounded-full border border-gray-300 shadow-lg cursor-pointer"
+                >
+                  <FilePenLine size={16} className="text-primary" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="profile-photo"
+                  />
+                </label>
+              )}
             </div>
           </div>
         </div>
@@ -155,7 +166,7 @@ export function ProfileForm() {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name" {...field} />
+                  <Input placeholder="Name" {...field} disabled={!isEditable} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -197,7 +208,11 @@ export function ProfileForm() {
               <FormItem>
                 <FormLabel>Address</FormLabel>
                 <FormControl>
-                  <Input placeholder="Address" {...field} />
+                  <Input
+                    placeholder="Address"
+                    {...field}
+                    disabled={!isEditable}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -208,25 +223,27 @@ export function ProfileForm() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <FormLabel>Emergency Contacts</FormLabel>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        append({ name: "", relation: "", phoneNo: "" })
-                      }
-                    >
-                      <UserPlus size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-muted text-muted-foreground">
-                    <p>Add Contact</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              {isEditable && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() =>
+                          append({ name: "", relation: "", phoneNo: "" })
+                        }
+                      >
+                        <UserPlus size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-muted text-muted-foreground">
+                      <p>Add Contact</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
             {fields.map((field, index) => (
               <div key={field.id} className="flex items-center gap-4 mb-6">
@@ -237,7 +254,11 @@ export function ProfileForm() {
                     render={({ field }) => (
                       <FormItem className="w-full sm:w-auto flex-1">
                         <FormControl>
-                          <Input placeholder="Name" {...field} />
+                          <Input
+                            placeholder="Name"
+                            {...field}
+                            disabled={!isEditable}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
@@ -248,7 +269,11 @@ export function ProfileForm() {
                     render={({ field }) => (
                       <FormItem className="w-full sm:w-auto flex-1">
                         <FormControl>
-                          <Input placeholder="Relation" {...field} />
+                          <Input
+                            placeholder="Relation"
+                            {...field}
+                            disabled={!isEditable}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
@@ -259,7 +284,11 @@ export function ProfileForm() {
                     render={({ field }) => (
                       <FormItem className="w-full sm:w-auto flex-1">
                         <FormControl>
-                          <Input placeholder="Phone Number" {...field} />
+                          <Input
+                            placeholder="Phone Number"
+                            {...field}
+                            disabled={!isEditable}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
@@ -275,6 +304,7 @@ export function ProfileForm() {
                         size="icon"
                         className="self-start"
                         onClick={() => remove(index)}
+                        disabled={!isEditable}
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -289,7 +319,7 @@ export function ProfileForm() {
           </div>
           <div className="flex gap-4">
             <Button type="submit" size={buttonSize}>
-              Update profile
+              {isEditable ? "Update Profile" : "Edit Profile"}
             </Button>
             <Button
               type="button"

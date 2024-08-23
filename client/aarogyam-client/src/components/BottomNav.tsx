@@ -1,41 +1,69 @@
 import React from "react";
 import {
-  BellDot,
   CalendarDays,
+  CircleEllipsis,
   House,
+  MessagesSquare,
   PillBottle,
   SquareLibrary,
 } from "lucide-react";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function BottomNav() {
   return (
     <nav className="fixed bottom-0 w-full py-4 z-10 bg-zinc-100 dark:bg-zinc-950 border-t dark:border-zinc-800 border-zinc-200 shadow-lg sm:hidden ">
       <ul className="flex flex-row justify-around items-center bg-transparent w-full">
-        <li>
-          <Link href="/" className="flex flex-col items-center">
-            <House size={24} />
+        <li className="flex items-center">
+          <Link href="/patient/">
+            <House size={24} /> {/*Dashboard*/}
           </Link>
         </li>
-        <li>
-          <Link href="/" className="flex flex-col items-center">
+        <li className="flex items-center">
+          <Link href="/patient/medical-records">
             <SquareLibrary size={24} />
+            {/*Medical Records*/}
           </Link>
         </li>
-        <li>
-          <Link href="/" className="flex items-center">
+        <li className="flex items-center">
+          <Link href="/patient/appointments">
             <CalendarDays size={24} />
+            {/*Appointments*/}
           </Link>
         </li>
-        <li>
-          <Link href="/" className="flex items-center">
+        <li className="flex items-center">
+          <Link href="/patient/medications">
             <PillBottle size={24} />
+            {/*Medications*/}
           </Link>
         </li>
-        <li>
-          <Link href="/" className="flex items-center">
-            <BellDot size={24} />
-          </Link>
+        <li className="flex items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <CircleEllipsis size={24} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel></DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link
+                  href="/patient/profile"
+                  className="flex items-center gap-2"
+                >
+                  <MessagesSquare size={16} /> AI Chats
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Team</DropdownMenuItem>
+              <DropdownMenuItem>Subscription</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </li>
       </ul>
     </nav>

@@ -189,11 +189,12 @@ function DoctorCard({
                           <PopoverContent className="p-0 w-fit">
                             <Calendar
                               mode="single"
+                              className="rounded-md border"
                               selected={date}
                               onSelect={(selectedDate) =>
                                 setValue("date", selectedDate || new Date())
                               }
-                              className="rounded-md border"
+                              disabled={(date: Date) => date < new Date()}
                             />
                           </PopoverContent>
                         </Popover>
