@@ -1,18 +1,27 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
 import {
+  Apple,
   BellDot,
   CalendarDays,
   House,
   MessagesSquare,
   PillBottle,
   SquareLibrary,
+  User,
 } from "lucide-react";
 import { SidebarItem } from "@/components/SidebarItem";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import BottomNav from "@/components/BottomNav";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 export default function PatientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname(); // Get the current pathname
@@ -46,6 +55,11 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
       icon: <MessagesSquare size={24} />,
       href: "/patient/ai-chat",
     },
+    {
+      text: "Know Your Food",
+      icon: <Apple size={24} />,
+      href: "/patient/know-your-food",
+    },
   ];
 
   return (
@@ -64,8 +78,49 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </Sidebar>
-          <div className="overflow-x-hidden px-8 md:px-10 lg:px-16 pb-4">
-            {children}
+          <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
+            {/*header bar*/}
+            <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
+              <Link href="/">
+                <Image
+                  src="/logo.svg"
+                  className="overflow-hidden transition-all delay-200"
+                  width={128}
+                  height={64}
+                  alt="Logo"
+                />
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <img
+                    src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-md"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {/*<DropdownMenuLabel></DropdownMenuLabel>*/}
+                  {/*<DropdownMenuSeparator />*/}
+                  <DropdownMenuItem>
+                    <Link
+                      href="/patient/profile"
+                      className="flex items-center gap-2"
+                    >
+                      <User size={16} /> Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link
+                      href="/patient/reminders"
+                      className="flex items-center gap-2"
+                    >
+                      <BellDot size={16} /> Reminders
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <div className="px-8 mt-16 sm:mt-2">{children}</div>
           </div>
         </div>
         <BottomNav />
