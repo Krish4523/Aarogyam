@@ -23,38 +23,37 @@ enum Role {
 }
 
 model User {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  email              String               @unique
-  password           String
-  role               Role
-  phone              String               @unique
-  address            String?
-  profile_image      String?
-  isVerified         Boolean              @default(false)
-  created_at         DateTime             @default(now())
-  updated_at         DateTime             @updatedAt
-  VerificationToken  VerificationToken?
-  ResetPasswordToken ResetPasswordToken[]
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password      String
+  role          Role
+  phone         String   @unique
+  address       String?
+  profile_image String?
+  isVerified    Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  Token Token[]
 
   @@map("users")
 }
 
-model VerificationToken {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
-  token      String
-  created_at DateTime @default(now())
-  userId     Int      @unique
+enum TokenType {
+  VERIFICATION
+  RESET_PASSWORD
 }
 
-model ResetPasswordToken {
-  id        Int      @id @default(autoincrement())
+model Token {
+  id        Int       @id @default(autoincrement())
   userId    Int
-  token     String   @unique
-  createdAt DateTime @default(now())
+  token     String    @unique
+  type      TokenType
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id])
 
-  @@index([userId])
+  @@index([userId, type])
+  @@map("tokens")
 }
