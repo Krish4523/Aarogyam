@@ -51,12 +51,12 @@ export const updateIsVerified = async (id: number): Promise<User> => {
 };
 
 /**
- * Finds a user by their ID.
+ * Finds a safe user by their ID.
  *
  * @param id - The ID of the user to find.
  * @returns A promise that resolves to the found user or null if no user is found.
  */
-export const findByID = async (id: number) => {
+export const findSafeUserByID = async (id: number) => {
   return userClient.findUnique({
     where: {
       id,
@@ -72,6 +72,74 @@ export const findByID = async (id: number) => {
       isVerified: true,
       created_at: true,
       updated_at: true,
+    },
+  });
+};
+
+/**
+ * Finds a safe user by their ID.
+ *
+ * @param id - The ID of the user to find.
+ * @returns A promise that resolves to the found user or null if no user is found.
+ */
+export const findByID = async (id: number) => {
+  return userClient.findUnique({
+    where: {
+      id,
+    },
+  });
+};
+
+export const updatePassword = async (id: number, newPassword: string) => {
+  return userClient.update({
+    where: {
+      id,
+    },
+    data: {
+      password: newPassword,
+    },
+  });
+};
+
+export const findByEmail = async (email: string | null) => {
+  return userClient.findUnique({
+    where: {
+      email: email || undefined,
+    },
+  });
+};
+
+export const resetPassword = async (
+  hashedPassword: string,
+  id: number
+): Promise<User> => {
+  return userClient.update({
+    where: {
+      id,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+};
+
+export const updateUser = async (
+  userName: string,
+  userPhoneNumber: string,
+  userAddress: string | null,
+  userImage: string | null,
+  id: number
+): Promise<User> => {
+  return userClient.update({
+    where: {
+      id,
+    },
+    data: {
+      name: userName,
+      phone: userPhoneNumber,
+      address: userAddress,
+      profile_image: userImage,
+      updated_at: new Date(),
     },
   });
 };
