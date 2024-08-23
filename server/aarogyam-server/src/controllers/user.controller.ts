@@ -40,7 +40,7 @@ export const changePassword = async (
 ): Promise<any> => {
   try {
     const { old_password, password, password_confirmation } = req.body;
-    const userId = parseInt(req.params.id, 10); // give user id from url
+    const user: SafeUser = req.user as User;
     if (!password || !password_confirmation || !old_password) {
       res
         .status(httpStatus.BAD_REQUEST)
@@ -50,7 +50,7 @@ export const changePassword = async (
       old_password,
       password,
       password_confirmation,
-      userId
+      user.id
     );
     return res.status(result.code).json(result);
   } catch (error: unknown) {
@@ -64,7 +64,7 @@ export const updateUser = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const user: SafeUser = req.user as User;
     const { name, phoneNumber, address } = req.body;
     const profileImage = req.file ? req.file.path : null;
     let relativePath;
@@ -78,7 +78,7 @@ export const updateUser = async (
       phoneNumber,
       address,
       relativePath,
-      userId
+      user.id
     );
     return res.status(result.code).json(result);
   } catch (error: unknown) {

@@ -17,10 +17,10 @@ router.use(verifyJWT);
  */
 router.route("").get(userController.getUser);
 
-router.post("/changePassword/:id", userController.changePassword);
+router.post("/changePassword", userController.changePassword);
 
 router.put(
-  "/updateUser/:id",
+  "/updateUser/",
   upload.single("profileImage"),
   userController.updateUser
 );

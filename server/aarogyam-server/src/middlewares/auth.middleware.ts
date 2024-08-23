@@ -30,7 +30,7 @@ export const verifyJWT = async (
     const { id }: any = await jwt.verify(token, env.JWT_SECRET);
 
     // Find the user by ID from the payload
-    const user: any = await userDao.findByID(id);
+    const user: any = await userDao.findSafeUserByID(id);
 
     // If user is not found, respond with unauthorized error
     if (!user) throw Format.unAuthorized("Invalid access token");

@@ -1,5 +1,6 @@
 import { PrismaClient, User } from "@prisma/client";
 import { UserSignUp } from "../types/user";
+
 const userClient = new PrismaClient().user;
 
 /**
@@ -50,12 +51,12 @@ export const updateIsVerified = async (id: number): Promise<User> => {
 };
 
 /**
- * Finds a user by their ID.
+ * Finds a safe user by their ID.
  *
  * @param id - The ID of the user to find.
  * @returns A promise that resolves to the found user or null if no user is found.
  */
-export const findByID = async (id: number) => {
+export const findSafeUserByID = async (id: number) => {
   return userClient.findUnique({
     where: {
       id,
@@ -71,7 +72,20 @@ export const findByID = async (id: number) => {
       isVerified: true,
       created_at: true,
       updated_at: true,
-      password: true,
+    },
+  });
+};
+
+/**
+ * Finds a safe user by their ID.
+ *
+ * @param id - The ID of the user to find.
+ * @returns A promise that resolves to the found user or null if no user is found.
+ */
+export const findByID = async (id: number) => {
+  return userClient.findUnique({
+    where: {
+      id,
     },
   });
 };
