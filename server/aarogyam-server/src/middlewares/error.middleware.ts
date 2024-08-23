@@ -14,13 +14,13 @@ import {
  * @param err - The error object.
  * @param req - The request object.
  * @param res - The response object.
- * @param next - The next middleware function.
+ * @param _
  */
 const errorMiddleware = (
   err: any,
   req: Request,
   res: Response,
-  next: NextFunction
+  _: NextFunction
 ) => {
   const status = err.statusCode || err.code || 500;
   const message = err.message || "Something went wrong";

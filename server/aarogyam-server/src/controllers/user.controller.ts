@@ -1,12 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "@prisma/client";
 import { SafeUser } from "../types/user";
-import path from "path";
-import httpStatus from "../utils/http-status";
 import Format from "../utils/format";
 import * as userService from "../services/user.service";
-// import { PrismaClient } from "@prisma/client";
-// const prisma = new PrismaClient();
 
 /**
  * Handles the request to get the user information.
@@ -22,7 +18,7 @@ export const getUser = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const user: SafeUser = req.user as User;
+    const user: SafeUser = req.user as SafeUser;
     if (!user) return Format.error(500, "Some error occurred");
     return res.status(200).json(user);
   } catch (error: unknown) {
@@ -30,26 +26,26 @@ export const getUser = async (
   }
 };
 
-/*
- * User can change password after authentication
- * */
+/**
+ * Handles the request to change the user's password.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next middleware function.
+ * @returns A promise that resolves to the response of the change password request.
+ */
 export const changePassword = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { old_password, password, password_confirmation } = req.body;
-    const user: SafeUser = req.user as User;
-    if (!password || !password_confirmation || !old_password) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(Format.badRequest(null, "All fields are required!"));
-    }
+    const { old_password, password, confirm_password } = req.body;
+    const user = req.user as User;
     const result: any = await userService.changePassword(
       old_password,
       password,
-      password_confirmation,
+      confirm_password,
       user.id
     );
     return res.status(result.code).json(result);
@@ -58,26 +54,28 @@ export const changePassword = async (
   }
 };
 
+/**
+ * Handles the request to update the user's information.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next middleware function.
+ * @returns A promise that resolves to the response of the update user request.
+ */
 export const updateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> => {
   try {
-    const user: SafeUser = req.user as User;
+    const user = req.user as User;
     const { name, phoneNumber, address } = req.body;
-    const profileImage = req.file ? req.file.path : null;
-    let relativePath;
-    if (req.file) {
-      relativePath = path.join(".", req.file.filename);
-    } else {
-      relativePath = profileImage;
-    }
+    const profileImage = req.file?.path;
     const result: any = await userService.updateUser(
       name,
       phoneNumber,
       address,
-      relativePath,
+      profileImage,
       user.id
     );
     return res.status(result.code).json(result);

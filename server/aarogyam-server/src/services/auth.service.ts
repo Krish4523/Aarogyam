@@ -2,29 +2,34 @@ import * as userDao from "../dao/user.dao";
 import Format from "../utils/format";
 import bcrypt from "bcrypt";
 import { generateTokens } from "../utils/generateAccessToken";
-import { ResetPasswordToken, User, VerificationToken } from "@prisma/client";
-import { UserSignUp } from "../types/user";
+import { Role, Token, TokenType, User } from "@prisma/client";
 import crypto from "crypto";
-import * as verificationTokenDao from "../dao/verificationToken.dao";
+import * as tokenDao from "../dao/token.dao";
 import { sendEmail } from "./mail.service";
 import env from "../configs/env";
-import * as resetPasswordTokenDao from "../dao/resetPasswordToken.dao";
 
 /**
  * Logs in a user by verifying their email/phone and password.
  * If the user is not verified, a verification email is sent.
  * If the credentials are valid, an access token is returned.
  *
- * @param email - The email of the user to log in.
- * @param phone - The phone number of the user to log in.
- * @param password - The password of the user to log in.
- * @returns The access token if the login is successful, or an error message if not.
+ * @param {string | null} email - The email of the user to log in.
+ * @param {string | null} phone - The phone number of the user to log in.
+ * @param {string} password - The password of the user to log in.
+ * @returns {Promise<any>} The access token if the login is successful, or an error message if not.
  */
 export const loginUser = async (
   email: string | null,
   phone: string | null,
   password: string
 ): Promise<any> => {
+  if ((!email && !phone) || !password) {
+    return Format.badRequest(
+      null,
+      "Username or phone number and password are required"
+    );
+  }
+
   const user: any = await userDao.findByEmailOrPhone(email, phone);
 
   if (!user) return Format.notFound("User not found");
@@ -48,19 +53,35 @@ export const loginUser = async (
 /**
  * Signs up a new user.
  *
- * @param userSignUp - The user data to sign up.
- * @returns A promise that resolves to the result of the sign-up process.
+ * @param {string} name - The name of the user.
+ * @param {string} email - The email of the user.
+ * @param {string} phone - The phone number of the user.
+ * @param {string} password - The password of the user.
+ * @returns {Promise<any>} A promise that resolves to the result of the sign-up process.
  */
-export async function signUp(userSignUp: UserSignUp): Promise<any> {
-  const { email, phone, password } = userSignUp;
+export async function signUp(
+  name: string,
+  email: string,
+  phone: string,
+  password: string
+): Promise<any> {
+  if (!name || !email || !phone || !password) {
+    return Format.badRequest(null, "All fields are required");
+  }
 
   const existingUser: any = await userDao.findByEmailOrPhone(email, phone);
 
   if (existingUser) return Format.conflict(null, "User already exists");
 
-  userSignUp.password = await bcrypt.hash(password, 10);
+  const hashPassword = await bcrypt.hash(password, 10);
 
-  const user: User = await userDao.create(userSignUp);
+  const user: User = await userDao.create({
+    name,
+    email,
+    phone,
+    password: hashPassword,
+    role: Role.Patient,
+  });
 
   await sendVerificationMail(user);
 
@@ -74,14 +95,17 @@ export async function signUp(userSignUp: UserSignUp): Promise<any> {
 /**
  * Sends a verification email to the user.
  *
- * @param user - The user to send the verification email to.
- * @returns A promise that resolves when the email is sent.
+ * @param {User} user - The user to send the verification email to.
+ * @returns {Promise<void>} A promise that resolves when the email is sent.
  */
 const sendVerificationMail = async (user: User) => {
   const uuid = crypto.randomUUID();
-  await verificationTokenDao.deleteByUserId(user.id);
-  const verificationToken: VerificationToken =
-    await verificationTokenDao.create(user.id, uuid);
+  await tokenDao.deleteTokensByUserId(user.id, TokenType.VERIFICATION);
+  const verificationToken: Token = await tokenDao.createToken(
+    user.id,
+    uuid,
+    TokenType.VERIFICATION
+  );
   sendEmail({
     recipients: [{ email: user.email }],
     params: {
@@ -95,11 +119,16 @@ const sendVerificationMail = async (user: User) => {
 /**
  * Verifies a user's email using a verification token.
  *
- * @param token - The verification token.
- * @returns A promise that resolves to the result of the verification process.
+ * @param {string} token - The verification token.
+ * @returns {Promise<any>} A promise that resolves to the result of the verification process.
  */
 export async function verifyToken(token: string) {
-  const verificationToken: any = await verificationTokenDao.getByToken(token);
+  if (!token) return Format.badRequest(null, "Sorry Some error occurred");
+
+  const verificationToken: any = await tokenDao.getTokenByTokenString(
+    token,
+    TokenType.VERIFICATION
+  );
 
   if (!verificationToken) return Format.notFound("Invalid Verification Token");
 
@@ -107,52 +136,80 @@ export async function verifyToken(token: string) {
 
   if (!user.isVerified) return Format.error(500, "Some error occurred");
 
-  if (verificationToken) await verificationTokenDao.deleteByUserId(user.id);
+  if (verificationToken)
+    await tokenDao.deleteTokensByUserId(user.id, TokenType.VERIFICATION);
 
   return Format.success(null, "Email successfully verified");
 }
 
-export const sendResetMail = async (email: string): Promise<any> => {
-  const user = await userDao.findByEmail(email);
-  if (!user) {
-    return Format.notFound("User not found");
-  }
-  await sendRestPasswordMail(user);
+/**
+ * Sends a reset password email to the user.
+ *
+ * @param {string} email - The email of the user to send the reset password email to.
+ * @returns {Promise<any>} A promise that resolves to the result of the email sending process.
+ */
+export const sendResetPasswordMail = async (email: string): Promise<any> => {
+  if (!email) return Format.badRequest(null, "All fields are required!");
 
-  if (user) return Format.success(null, "Reset password mail sent");
-};
+  const user: User | null = await userDao.findByEmail(email);
 
-const sendRestPasswordMail = async (user: User) => {
+  if (!user) return Format.notFound("User not found");
+
   const uuid = crypto.randomUUID();
-  await resetPasswordTokenDao.deleteByUserId(user.id);
-  const resetPasswordToken: ResetPasswordToken =
-    await resetPasswordTokenDao.create(user.id, uuid);
+  await tokenDao.deleteTokensByUserId(user.id, TokenType.RESET_PASSWORD);
+  const resetPasswordToken: Token = await tokenDao.createToken(
+    user.id,
+    uuid,
+    TokenType.RESET_PASSWORD
+  );
 
+  // Note: Change the below mail to reset mail
   sendEmail({
     recipients: [{ email: user.email }],
     params: {
       verification_url: `${env.BACKEND_URL}/api/main_service/v1/auth/reset-password/${resetPasswordToken.token}`,
       name: user.name,
     },
-    templateId: 1, // change template id for reset password
+    templateId: 1,
   });
+
+  if (user) return Format.success(null, "Reset password mail sent");
 };
 
+/**
+ * Resets the user's password using a reset token.
+ *
+ * @param {string} password - The new password.
+ * @param {string} confirmPassword - The confirmation of the new password.
+ * @param {string} token - The reset password token.
+ * @returns {Promise<any>} A promise that resolves to the result of the password reset process.
+ */
 export const resetPassword = async (
   password: string,
-  passwordConfirmation: string,
+  confirmPassword: string,
   token: string
 ): Promise<any> => {
-  const resetPasswordToken: any = await resetPasswordTokenDao.getByToken(token);
+  if (!token) return Format.badRequest(null, "Sorry Some error occurred");
+
+  if (!password || !confirmPassword)
+    return Format.badRequest(null, "All fields are required!");
+
+  const resetPasswordToken: any = await tokenDao.getTokenByTokenString(
+    token,
+    TokenType.RESET_PASSWORD
+  );
 
   if (!resetPasswordToken) return Format.notFound("Invalid Verification Token");
 
-  if (password === passwordConfirmation) {
-    const salt = await bcrypt.genSalt(10);
-    const newHashPassword = await bcrypt.hash(password, salt);
-    await userDao.resetPassword(newHashPassword, resetPasswordToken.user.id);
-    return Format.success("Password reset successfully");
-  } else {
+  if (password !== confirmPassword)
     return Format.badRequest(null, "Passwords do not match");
-  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  await userDao.resetPassword(hashedPassword, resetPasswordToken.user.id);
+  await tokenDao.deleteTokensByUserId(
+    resetPasswordToken.user.id,
+    TokenType.RESET_PASSWORD
+  );
+  return Format.success("Password reset successfully");
 };

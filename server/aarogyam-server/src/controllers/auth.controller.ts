@@ -1,19 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import httpStatus from "../utils/http-status";
-import Format from "../utils/format";
 import * as authService from "../services/auth.service";
-import { UserSignUp } from "../types/user";
-import { Role } from "@prisma/client";
-// import exp from "node:constants";
-// import * as userService from "../services/user.service";
 
 /**
  * Handles user login requests.
  *
- * @param req - The request object.
- * @param res - The response object.
- * @param next - The next middleware function.
- * @returns A promise that resolves to the response of the login request.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the response of the login request.
  */
 export const loginController = async (
   req: Request,
@@ -22,20 +16,7 @@ export const loginController = async (
 ): Promise<any> => {
   try {
     const { email, phone, password } = req.body;
-
-    if ((!email && !phone) || !password) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(
-          Format.badRequest(
-            null,
-            "Username or phone number and password are required"
-          )
-        );
-    }
-
     const result: any = await authService.loginUser(email, phone, password);
-
     return res.status(result.code).json(result);
   } catch (error: unknown) {
     next(error);
@@ -45,10 +26,10 @@ export const loginController = async (
 /**
  * Handles user sign-up requests.
  *
- * @param req - The request object.
- * @param res - The response object.
- * @param next - The next middleware function.
- * @returns A promise that resolves to the response of the sign-up request.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the response of the sign-up request.
  */
 export const signUpController = async (
   req: Request,
@@ -57,22 +38,7 @@ export const signUpController = async (
 ): Promise<any> => {
   try {
     const { name, email, phone, password } = req.body;
-    if (!name || !email || !phone || !password) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(Format.badRequest(null, "All fields are required"));
-    }
-
-    const user: UserSignUp = {
-      name,
-      email,
-      phone,
-      password,
-      role: Role.Patient,
-    };
-
-    const result: any = await authService.signUp(user);
-
+    const result: any = await authService.signUp(name, email, phone, password);
     return res.status(result.code).json(result);
   } catch (error: unknown) {
     next(error);
@@ -82,10 +48,10 @@ export const signUpController = async (
 /**
  * Handles token verification requests.
  *
- * @param req - The request object.
- * @param res - The response object.
- * @param next - The next middleware function.
- * @returns A promise that resolves to the response of the token verification request.
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the response of the token verification request.
  */
 export const verifyTokenController = async (
   req: Request,
@@ -94,20 +60,21 @@ export const verifyTokenController = async (
 ): Promise<any> => {
   try {
     const { token } = req.params;
-    if (!token) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(Format.badRequest(null, "Sorry Some error occurred"));
-    }
-
     const result: any = await authService.verifyToken(token);
-
     return res.status(result.code).json(result);
   } catch (error: unknown) {
     next(error);
   }
 };
 
+/**
+ * Handles requests to send a reset password email.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the response of the reset password email request.
+ */
 export const sendRestPasswordMail = async (
   req: Request,
   res: Response,
@@ -115,41 +82,32 @@ export const sendRestPasswordMail = async (
 ): Promise<any> => {
   try {
     const { email } = req.body;
-    if (!email) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(Format.badRequest(null, "All fields are required!"));
-    }
-    const result: any = await authService.sendResetMail(email);
+    const result: any = await authService.sendResetPasswordMail(email);
     return res.status(result.code).json(result);
   } catch (error: unknown) {
     next(error);
   }
 };
 
+/**
+ * Handles requests to reset a user's password.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the response of the password reset request.
+ */
 export const resetPassword = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> => {
-  const { password, password_confirnmation } = req.body;
-
   try {
     const { token } = req.params;
-    if (!token) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(Format.badRequest(null, "Sorry Some error occurred"));
-    }
-
-    if (!password || !password_confirnmation) {
-      res
-        .status(httpStatus.BAD_REQUEST)
-        .json(Format.badRequest(null, "All fields are required!"));
-    }
+    const { password, confirm_password } = req.body;
     const result: any = await authService.resetPassword(
       password,
-      password_confirnmation,
+      confirm_password,
       token
     );
     return res.status(result.code).json(result);

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import * as authController from "../controllers/auth.controller";
-// import * as userController from "../controllers/user.controller";
 
 const router: Router = Router();
 
@@ -31,8 +30,22 @@ router.route("/signup").post(authController.signUpController);
  */
 router.route("/verify/:token").get(authController.verifyTokenController);
 
+/**
+ * Route to send a reset password email.
+ *
+ * @route POST /sendRestPasswordMail/
+ * @access Public
+ * @controller authController.sendRestPasswordMail
+ */
 router.post("/sendRestPasswordMail/", authController.sendRestPasswordMail);
 
-router.post("/resetPassword/:token", authController.resetPassword);
+/**
+ * Route to reset the user's password.
+ *
+ * @route POST /resetPassword/:token
+ * @access Public
+ * @controller authController.resetPassword
+ */
+router.post("/reset-password/:token", authController.resetPassword);
 
 export default router;

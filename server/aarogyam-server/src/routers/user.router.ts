@@ -17,10 +17,24 @@ router.use(verifyJWT);
  */
 router.route("").get(userController.getUser);
 
-router.post("/changePassword", userController.changePassword);
+/**
+ * Route to change the user's password.
+ *
+ * @route PATCH /changePassword
+ * @access Protected
+ * @controller userController.changePassword
+ */
+router.patch("/changePassword", userController.changePassword);
 
+/**
+ *
+ * @route PUT /updateUser/
+ * @access Protected
+ * @middleware upload.single("profileImage")
+ * @controller userController.updateUser
+ */
 router.put(
-  "/updateUser/",
+  "/update/",
   upload.single("profileImage"),
   userController.updateUser
 );

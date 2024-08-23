@@ -56,7 +56,7 @@ export const updateIsVerified = async (id: number): Promise<User> => {
  * @param id - The ID of the user to find.
  * @returns A promise that resolves to the found user or null if no user is found.
  */
-export const findSafeUserByID = async (id: number) => {
+export const findSafeUserByID = async (id: number): Promise<User | null> => {
   return userClient.findUnique({
     where: {
       id,
@@ -70,19 +70,17 @@ export const findSafeUserByID = async (id: number) => {
       address: true,
       profile_image: true,
       isVerified: true,
-      created_at: true,
-      updated_at: true,
     },
   });
 };
 
 /**
- * Finds a safe user by their ID.
+ * Finds a user by their ID.
  *
  * @param id - The ID of the user to find.
  * @returns A promise that resolves to the found user or null if no user is found.
  */
-export const findByID = async (id: number) => {
+export const findByID = async (id: number): Promise<User | null> => {
   return userClient.findUnique({
     where: {
       id,
@@ -90,6 +88,13 @@ export const findByID = async (id: number) => {
   });
 };
 
+/**
+ * Updates the password of a user.
+ *
+ * @param id - The ID of the user to update.
+ * @param newPassword - The new password to set.
+ * @returns A promise that resolves to the updated user.
+ */
 export const updatePassword = async (id: number, newPassword: string) => {
   return userClient.update({
     where: {
@@ -101,16 +106,29 @@ export const updatePassword = async (id: number, newPassword: string) => {
   });
 };
 
-export const findByEmail = async (email: string | null) => {
+/**
+ * Finds a user by their email.
+ *
+ * @param email - The email of the user to find.
+ * @returns A promise that resolves to the found user or null if no user is found.
+ */
+export const findByEmail = async (email: string): Promise<User | null> => {
   return userClient.findUnique({
     where: {
-      email: email || undefined,
+      email,
     },
   });
 };
 
+/**
+ * Resets the password of a user.
+ *
+ * @param password - The new password to set.
+ * @param id - The ID of the user to update.
+ * @returns A promise that resolves to the updated user.
+ */
 export const resetPassword = async (
-  hashedPassword: string,
+  password: string,
   id: number
 ): Promise<User> => {
   return userClient.update({
@@ -118,16 +136,26 @@ export const resetPassword = async (
       id,
     },
     data: {
-      password: hashedPassword,
+      password,
     },
   });
 };
 
+/**
+ * Updates the user information.
+ *
+ * @param name
+ * @param phone
+ * @param address
+ * @param profileImage
+ * @param id - The ID of the user to update.
+ * @returns A promise that resolves to the updated user.
+ */
 export const updateUser = async (
-  userName: string,
-  userPhoneNumber: string,
-  userAddress: string | null,
-  userImage: string | null,
+  name: string,
+  phone: string,
+  address: string | null,
+  profileImage: string | undefined,
   id: number
 ): Promise<User> => {
   return userClient.update({
@@ -135,11 +163,10 @@ export const updateUser = async (
       id,
     },
     data: {
-      name: userName,
-      phone: userPhoneNumber,
-      address: userAddress,
-      profile_image: userImage,
-      updated_at: new Date(),
+      name,
+      phone,
+      address,
+      profile_image: profileImage,
     },
   });
 };
