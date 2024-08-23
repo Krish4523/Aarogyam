@@ -4,6 +4,8 @@ import Format from "../utils/format";
 import * as authService from "../services/auth.service";
 import { UserSignUp } from "../types/user";
 import { Role } from "@prisma/client";
+// import exp from "node:constants";
+// import * as userService from "../services/user.service";
 
 /**
  * Handles user login requests.
@@ -100,6 +102,56 @@ export const verifyTokenController = async (
 
     const result: any = await authService.verifyToken(token);
 
+    return res.status(result.code).json(result);
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const sendRestPasswordMail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res
+        .status(httpStatus.BAD_REQUEST)
+        .json(Format.badRequest(null, "All fields are required!"));
+    }
+    const result: any = await authService.sendResetMail(email);
+    return res.status(result.code).json(result);
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  const { password, password_confirnmation } = req.body;
+
+  try {
+    const { token } = req.params;
+    if (!token) {
+      res
+        .status(httpStatus.BAD_REQUEST)
+        .json(Format.badRequest(null, "Sorry Some error occurred"));
+    }
+
+    if (!password || !password_confirnmation) {
+      res
+        .status(httpStatus.BAD_REQUEST)
+        .json(Format.badRequest(null, "All fields are required!"));
+    }
+    const result: any = await authService.resetPassword(
+      password,
+      password_confirnmation,
+      token
+    );
     return res.status(result.code).json(result);
   } catch (error: unknown) {
     next(error);

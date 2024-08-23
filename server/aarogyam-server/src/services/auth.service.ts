@@ -2,12 +2,13 @@ import * as userDao from "../dao/user.dao";
 import Format from "../utils/format";
 import bcrypt from "bcrypt";
 import { generateTokens } from "../utils/generateAccessToken";
-import { User, VerificationToken } from "@prisma/client";
+import { ResetPasswordToken, User, VerificationToken } from "@prisma/client";
 import { UserSignUp } from "../types/user";
 import crypto from "crypto";
 import * as verificationTokenDao from "../dao/verificationToken.dao";
 import { sendEmail } from "./mail.service";
 import env from "../configs/env";
+import * as resetPasswordTokenDao from "../dao/resetPasswordToken.dao";
 
 /**
  * Logs in a user by verifying their email/phone and password.
@@ -110,3 +111,48 @@ export async function verifyToken(token: string) {
 
   return Format.success(null, "Email successfully verified");
 }
+
+export const sendResetMail = async (email: string): Promise<any> => {
+  const user = await userDao.findByEmail(email);
+  if (!user) {
+    return Format.notFound("User not found");
+  }
+  await sendRestPasswordMail(user);
+
+  if (user) return Format.success(null, "Reset password mail sent");
+};
+
+const sendRestPasswordMail = async (user: User) => {
+  const uuid = crypto.randomUUID();
+  await resetPasswordTokenDao.deleteByUserId(user.id);
+  const resetPasswordToken: ResetPasswordToken =
+    await resetPasswordTokenDao.create(user.id, uuid);
+
+  sendEmail({
+    recipients: [{ email: user.email }],
+    params: {
+      verification_url: `${env.BACKEND_URL}/api/main_service/v1/auth/reset-password/${resetPasswordToken.token}`,
+      name: user.name,
+    },
+    templateId: 1, // change template id for reset password
+  });
+};
+
+export const resetPassword = async (
+  password: string,
+  passwordConfirmation: string,
+  token: string
+): Promise<any> => {
+  const resetPasswordToken: any = await resetPasswordTokenDao.getByToken(token);
+
+  if (!resetPasswordToken) return Format.notFound("Invalid Verification Token");
+
+  if (password === passwordConfirmation) {
+    const salt = await bcrypt.genSalt(10);
+    const newHashPassword = await bcrypt.hash(password, salt);
+    await userDao.resetPassword(newHashPassword, resetPasswordToken.user.id);
+    return Format.success("Password reset successfully");
+  } else {
+    return Format.badRequest(null, "Passwords do not match");
+  }
+};
