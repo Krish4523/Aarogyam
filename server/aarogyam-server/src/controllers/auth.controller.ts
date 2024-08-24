@@ -104,12 +104,8 @@ export const resetPassword = async (
 ): Promise<any> => {
   try {
     const { token } = req.params;
-    const { password, confirm_password } = req.body;
-    const result: any = await authService.resetPassword(
-      password,
-      confirm_password,
-      token
-    );
+    const { password } = req.body;
+    const result: any = await authService.resetPassword(password, token);
     return res.status(result.code).json(result);
   } catch (error: unknown) {
     next(error);

@@ -180,19 +180,16 @@ export const sendResetPasswordMail = async (email: string): Promise<any> => {
  * Resets the user's password using a reset token.
  *
  * @param {string} password - The new password.
- * @param {string} confirmPassword - The confirmation of the new password.
  * @param {string} token - The reset password token.
  * @returns {Promise<any>} A promise that resolves to the result of the password reset process.
  */
 export const resetPassword = async (
   password: string,
-  confirmPassword: string,
   token: string
 ): Promise<any> => {
   if (!token) return Format.badRequest(null, "Sorry Some error occurred");
 
-  if (!password || !confirmPassword)
-    return Format.badRequest(null, "All fields are required!");
+  if (!password) return Format.badRequest(null, "All fields are required!");
 
   const resetPasswordToken: any = await tokenDao.getTokenByTokenString(
     token,
@@ -200,9 +197,6 @@ export const resetPassword = async (
   );
 
   if (!resetPasswordToken) return Format.notFound("Invalid Verification Token");
-
-  if (password !== confirmPassword)
-    return Format.badRequest(null, "Passwords do not match");
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);

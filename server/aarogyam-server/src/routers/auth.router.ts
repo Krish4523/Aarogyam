@@ -37,7 +37,7 @@ router.route("/verify/:token").get(authController.verifyTokenController);
  * @access Public
  * @controller authController.sendRestPasswordMail
  */
-router.post("/sendRestPasswordMail/", authController.sendRestPasswordMail);
+router.post("/send-reset-password-mail/", authController.sendRestPasswordMail);
 
 /**
  * Route to reset the user's password.

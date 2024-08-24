@@ -24,7 +24,7 @@ router.route("").get(userController.getUser);
  * @access Protected
  * @controller userController.changePassword
  */
-router.patch("/changePassword", userController.changePassword);
+router.patch("/change-password", userController.changePassword);
 
 /**
  *

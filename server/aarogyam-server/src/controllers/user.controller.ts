@@ -40,12 +40,11 @@ export const changePassword = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { old_password, password, confirm_password } = req.body;
+    const { old_password, password } = req.body;
     const user = req.user as User;
     const result: any = await userService.changePassword(
       old_password,
       password,
-      confirm_password,
       user.id
     );
     return res.status(result.code).json(result);
