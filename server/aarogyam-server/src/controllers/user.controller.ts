@@ -69,7 +69,7 @@ export const updateUser = async (
   try {
     const user = req.user as User;
     const { name, phoneNumber, address } = req.body;
-    const profileImage = req.file?.path;
+    const profileImage = req.file?.path || null;
     const result: any = await userService.updateUser(
       name,
       phoneNumber,

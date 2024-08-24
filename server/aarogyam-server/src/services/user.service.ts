@@ -47,7 +47,7 @@ export const updateUser = async (
   name: string,
   phoneNumber: string,
   address: string,
-  profileImage: string | undefined,
+  profileImage: string | null,
   userId: number
 ): Promise<any> => {
   const existingUser = await userDao.findByID(userId);
