@@ -16,6 +16,7 @@ interface EnvConfig {
   JWT_SECRET: string; // Secret key for JWT authentication
   BREVO_API_KEY: string; // API key for Brevo service
   BACKEND_URL: string; // URL of the backend server
+  FRONTEND_URL: string;
 }
 
 // Define the configuration object with environment variables
@@ -24,6 +25,7 @@ const config: EnvConfig = {
   JWT_SECRET: process.env.JWT_SECRET || "", // Get JWT secret from environment or default to an empty string
   BREVO_API_KEY: process.env.BREVO_API_KEY || "", // Get Brevo API key from environment or default to an empty string
   BACKEND_URL: process.env.BACKEND_URL || "", // Get backend URL from environment or default to an empty string
+  FRONTEND_URL: process.env.FRONTEND_URL || "",
 };
 
 export default config;
