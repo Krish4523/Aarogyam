@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Apple,
   CalendarDays,
   CircleEllipsis,
   House,
@@ -54,14 +55,20 @@ function BottomNav() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Link
-                  href="/patient/profile"
+                  href="/patient/ai-chat"
                   className="flex items-center gap-2"
                 >
                   <MessagesSquare size={16} /> AI Chats
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  href="/patient/know-your-food"
+                  className="flex items-center gap-2"
+                >
+                  <Apple size={16} /> Food Insights
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </li>

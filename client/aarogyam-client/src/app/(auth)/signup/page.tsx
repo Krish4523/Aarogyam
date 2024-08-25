@@ -61,7 +61,7 @@ function SignupPage() {
   async function onSubmit(data: SignUpForm) {
     await submitForm<SignUpForm>({
       data,
-      endpoint: "/api/signup",
+      endpoint: "auth/signup",
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {

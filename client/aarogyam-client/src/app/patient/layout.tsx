@@ -56,7 +56,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
       href: "/patient/ai-chat",
     },
     {
-      text: "Know Your Food",
+      text: "Food Insights",
       icon: <Apple size={24} />,
       href: "/patient/know-your-food",
     },

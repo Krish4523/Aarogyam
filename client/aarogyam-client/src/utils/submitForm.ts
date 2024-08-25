@@ -25,7 +25,7 @@ export async function submitForm<T extends FormDataRecord>({
 }: SubmitFormOptions<T>) {
   try {
     setLoading(true);
-
+    console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
     const formData = new FormData();
     for (const key in data) {
       formData.append(key, data[key as keyof typeof data]);
@@ -36,11 +36,15 @@ export async function submitForm<T extends FormDataRecord>({
     }
 
     // Send a POST request with the form data
-    const response = await axios.post(endpoint, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     console.log("Form submitted successfully:", response.data);
 
