@@ -137,3 +137,4 @@ docker-compose.yml
 Thumbs.db
 
 dist
+.env
