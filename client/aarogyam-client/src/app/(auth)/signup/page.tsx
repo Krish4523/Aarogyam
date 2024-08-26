@@ -22,10 +22,9 @@ import {
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { Loader2 } from "lucide-react";
-import { submitForm } from "@/utils/submitForm";
-import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface InputFieldsProps {
   name: "name" | "email" | "password" | "confirm_password" | "phone";
@@ -43,8 +42,10 @@ const inputFields: InputFieldsProps[] = [
 export type SignUpForm = z.infer<typeof SignUpSchema>;
 
 function SignupPage() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // const [loading, setLoading] = useState<boolean>(false);
+  const { signup, loading, errorMessage } = useAuth();
+
   const form: UseFormReturn<SignUpForm> = useForm<SignUpForm>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
@@ -55,11 +56,12 @@ function SignupPage() {
       phone: "",
     },
   });
-  const router = useRouter();
-  const { toast } = useToast();
+  // const router = useRouter();
+
+  // const { toast } = useToast();
 
   async function onSubmit(data: SignUpForm) {
-    await submitForm<SignUpForm>({
+    /*await submitForm<SignUpForm>({
       data,
       endpoint: "auth/signup",
       setLoading,
@@ -74,7 +76,8 @@ function SignupPage() {
           description: `${error}`,
         });
       },
-    });
+    });*/
+    await signup(data);
   }
 
   return (
