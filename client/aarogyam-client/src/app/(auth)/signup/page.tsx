@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";

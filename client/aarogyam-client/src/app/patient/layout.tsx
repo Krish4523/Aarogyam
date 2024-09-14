@@ -81,7 +81,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
           <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
             {/*header bar*/}
             <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
-              <Link href="/">
+              <Link href="/patient">
                 <Image
                   src="/logo.svg"
                   className="overflow-hidden transition-all delay-200"

@@ -24,25 +24,22 @@ function BottomNav() {
       <ul className="flex flex-row justify-around items-center bg-transparent w-full">
         <li className="flex items-center">
           <Link href="/patient/">
-            <House size={24} /> {/*Dashboard*/}
+            <House size={24} />
           </Link>
         </li>
         <li className="flex items-center">
           <Link href="/patient/medical-records">
             <SquareLibrary size={24} />
-            {/*Medical Records*/}
           </Link>
         </li>
         <li className="flex items-center">
           <Link href="/patient/appointments">
             <CalendarDays size={24} />
-            {/*Appointments*/}
           </Link>
         </li>
         <li className="flex items-center">
           <Link href="/patient/medications">
             <PillBottle size={24} />
-            {/*Medications*/}
           </Link>
         </li>
         <li className="flex items-center">

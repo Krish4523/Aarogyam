@@ -21,9 +21,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
 export type LoginForm = z.infer<typeof LoginSchema>;
