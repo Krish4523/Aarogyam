@@ -70,10 +70,10 @@ export const findSafeUserByID = async (
       role: true,
       phone: true,
       address: true,
-      profile_image: true,
+      profileImage: true,
       isVerified: true,
-      created_at: true,
-      updated_at: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 };
@@ -170,7 +170,7 @@ export const updateUser = async (
       name,
       phone,
       address,
-      profile_image: profileImage,
+      profileImage,
     },
   });
 };

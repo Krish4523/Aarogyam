@@ -7,6 +7,7 @@ import crypto from "crypto";
 import * as tokenDao from "../dao/token.dao";
 import { sendEmail } from "./mail.service";
 import env from "../configs/env";
+import * as patientDao from "../dao/patient.dao";
 
 /**
  * Logs in a user by verifying their email/phone and password.
@@ -83,7 +84,7 @@ export async function signUp(
     role: Role.PATIENT,
   });
 
-  // create patient
+  await patientDao.create({ userId: user.id });
 
   await sendVerificationMail(user);
 
