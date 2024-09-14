@@ -80,8 +80,10 @@ export async function signUp(
     email,
     phone,
     password: hashPassword,
-    role: Role.Patient,
+    role: Role.PATIENT,
   });
+
+  // create patient
 
   await sendVerificationMail(user);
 

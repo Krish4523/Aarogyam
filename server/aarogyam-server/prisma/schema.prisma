@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,35 +8,58 @@ datasource db {
 }
 
 enum Role {
-  Admin
-  Patient
-  Doctor
-  Hospital
-  DiagnosticCenter
-  Pharmacy
-}
-
-model User {
-  id            Int      @id @default(autoincrement())
-  name          String
-  email         String   @unique
-  password      String
-  role          Role
-  phone         String   @unique
-  address       String?
-  profile_image String?
-  isVerified    Boolean  @default(false)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  Token Token[]
-
-  @@map("users")
+  ADMIN
+  PATIENT
+  DOCTOR
+  HOSPITAL
 }
 
 enum TokenType {
   VERIFICATION
   RESET_PASSWORD
+}
+
+enum MedicineSource {
+  PATIENT
+  DOCTOR
+}
+
+enum AppointmentType {
+  ONLINE
+  OFFLINE
+}
+
+enum AppointmentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED_BY_PATIENT
+  CANCELLED_BY_DOCTOR
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  password     String
+  role         Role
+  phone        String   @unique
+  address      String?
+  profileImage String?
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tokens   Token[]
+  patient  Patient?
+  doctor   Doctor?
+  hospital Hospital?
+
+  @@map("users")
 }
 
 model Token {
@@ -57,3 +74,277 @@ model Token {
   @@index([userId, type])
   @@map("tokens")
 }
+
+model Hospital {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  name       String
+  address    String
+  phone      String
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id])
+  doctors      Doctor[]
+  services     ServicesOnHospital[]
+  appointments Appointment[]
+
+  @@map("hospitals")
+}
+
+model Services {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hospitals ServicesOnHospital[]
+
+  @@map("services")
+}
+
+model ServicesOnHospital {
+  hospitalId Int
+  serviceId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+  service  Services @relation(fields: [serviceId], references: [id])
+
+  @@id([hospitalId, serviceId])
+  @@map("hospital_services")
+}
+
+model Patient {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  gender    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user              User                @relation(fields: [userId], references: [id])
+  medicalRecords    MedicalRecord[]
+  medications       Medication[]
+  prescriptions     Prescription[]
+  appointments      Appointment[]
+  emergencyContacts EmergencyContacts[]
+
+  @@map("patients")
+}
+
+model EmergencyContacts {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  name      String
+  phone     String
+  relation  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@map("emergency_contacts")
+}
+
+model Doctor {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  gender     String
+  hospitalId Int?
+  rating     Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user             User                  @relation(fields: [userId], references: [id])
+  hospital         Hospital?             @relation(fields: [hospitalId], references: [id])
+  medicalRecords   MedicalRecord[]
+  prescriptions    Prescription[]
+  specialties      SpecialtiesOnDoctor[]
+  appointments     Appointment[]
+  appointmentSlots AppointmentSlot[]
+
+  @@map("doctors")
+}
+
+model Specialties {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctors SpecialtiesOnDoctor[]
+
+  @@map("specialties")
+}
+
+model SpecialtiesOnDoctor {
+  doctorId     Int
+  specialityId Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctor    Doctor      @relation(fields: [doctorId], references: [id])
+  specialty Specialties @relation(fields: [specialityId], references: [id])
+
+  @@id([doctorId, specialityId])
+}
+
+model MedicalRecord {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  doctorId    Int?
+  description String?
+  recordDate  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient Patient               @relation(fields: [patientId], references: [id])
+  doctor  Doctor?               @relation(fields: [doctorId], references: [id])
+  files   MedicalRecordFile[]
+  details MedicalRecordDetail[]
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@map("medical_records")
+}
+
+model MedicalRecordFile {
+  id              Int      @id @default(autoincrement())
+  url             String
+  medicalRecordId Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+
+  @@map("medical_record_files")
+}
+
+model MedicalRecordDetail {
+  id                     Int      @id @default(autoincrement())
+  medicalRecordId        Int
+  result                 Float
+  examinationReferenceId Int
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  medicalRecord MedicalRecord      @relation(fields: [medicalRecordId], references: [id])
+  examination   MedicalExamination @relation(fields: [examinationReferenceId], references: [id])
+
+  @@map("medical_record_details")
+}
+
+model MedicalExamination {
+  id               Int      @id @default(autoincrement())
+  name             String
+  unit             String?
+  gender           String?
+  normalRangeStart Float?
+  normalRangeEnd   Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  details MedicalRecordDetail[]
+
+  @@map("medical_examinations")
+}
+
+model Prescription {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  doctorId  Int
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient   Patient      @relation(fields: [patientId], references: [id])
+  doctor    Doctor       @relation(fields: [doctorId], references: [id])
+  medicines Medication[]
+  notes     String?
+
+  @@map("prescriptions")
+}
+
+model Medication {
+  id             Int      @id @default(autoincrement())
+  patientId      Int
+  prescriptionId Int?
+  name           String
+  dosage         String
+  frequency      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  patient      Patient          @relation(fields: [patientId], references: [id])
+  prescription Prescription?    @relation(fields: [prescriptionId], references: [id])
+  timesToTake  MedicationTime[]
+  source       MedicineSource
+
+  @@map("medications")
+}
+
+model MedicationTime {
+  id           Int      @id @default(autoincrement())
+  time         String
+  medicationId Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  medication Medication @relation(fields: [medicationId], references: [id])
+
+  @@map("medication_times")
+}
+
+model Appointment {
+  id         Int               @id @default(autoincrement())
+  patientId  Int
+  doctorId   Int
+  hospitalId Int
+  date       DateTime
+  type       AppointmentType
+  location   String?
+  videoLink  String?
+  status     AppointmentStatus
+  notes      String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  patient           Patient          @relation(fields: [patientId], references: [id])
+  doctor            Doctor           @relation(fields: [doctorId], references: [id])
+  hospital          Hospital         @relation(fields: [hospitalId], references: [id])
+  appointmentSlot   AppointmentSlot? @relation(fields: [appointmentSlotId], references: [id])
+  appointmentSlotId Int?             @unique
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([hospitalId])
+  @@map("appointments")
+}
+
+model AppointmentSlot {
+  id        Int             @id @default(autoincrement())
+  doctorId  Int
+  date      DateTime
+  startTime String
+  endTime   String
+  status    SlotStatus
+  type      AppointmentType
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  doctor      Doctor       @relation(fields: [doctorId], references: [id])
+  appointment Appointment?
+
+  @@index([doctorId])
+  @@index([date, startTime, endTime])
+  @@map("appointment_slots")
+}
+
+// reminder
+// payment
+// admin
+// ai chat (mongo)
+// know your food (mongo)
