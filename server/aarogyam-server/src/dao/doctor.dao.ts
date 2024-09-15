@@ -2,6 +2,15 @@ import { Doctor, PrismaClient } from "@prisma/client";
 
 const doctorClient = new PrismaClient().doctor;
 
+/**
+ * Creates a new doctor record in the database.
+ *
+ * @param {number} hospitalId - The ID of the hospital.
+ * @param {number} userId - The ID of the user.
+ * @param {string} gender - The gender of the doctor.
+ * @param {number} rating - The rating of the doctor.
+ * @returns {Promise<Doctor>} A promise that resolves to the created doctor.
+ */
 export const create = async (
   hospitalId: number,
   userId: number,
@@ -18,12 +27,25 @@ export const create = async (
   });
 };
 
+/**
+ * Finds a doctor by user ID.
+ *
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<Doctor | null>} A promise that resolves to the doctor if found, otherwise null.
+ */
 export async function findDoctorByUserId(userId: number) {
   return doctorClient.findUnique({
     where: { userId },
   });
 }
 
+/**
+ * Updates a doctor record in the database.
+ *
+ * @param {number} userId - The ID of the user.
+ * @param {Partial<Doctor>} data - The data to update.
+ * @returns {Promise<Doctor>} A promise that resolves to the updated doctor.
+ */
 export const updateDoctor = async (
   userId: number,
   data: Partial<Doctor>
@@ -36,10 +58,22 @@ export const updateDoctor = async (
   });
 };
 
+/**
+ * Deletes a doctor record from the database.
+ *
+ * @param {number} doctorId - The ID of the doctor.
+ * @returns {Promise<Doctor>} A promise that resolves to the deleted doctor.
+ */
 export const deleteDoctor = async (doctorId: number): Promise<Doctor> => {
   return doctorClient.delete({ where: { id: doctorId } });
 };
 
+/**
+ * Retrieves a doctor by ID.
+ *
+ * @param {number} doctorId - The ID of the doctor.
+ * @returns {Promise<Doctor | null>} A promise that resolves to the doctor if found, otherwise null.
+ */
 export const getDoctor = async (doctorId: number): Promise<Doctor | null> => {
   return doctorClient.findUnique({
     where: { id: doctorId },

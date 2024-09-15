@@ -7,6 +7,14 @@ import {
 } from "../types/user.dto";
 import Format from "../utils/format";
 
+/**
+ * Creates a new doctor.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the result of the creation operation.
+ */
 export const createDoctor = async (
   req: Request,
   res: Response,
@@ -33,6 +41,14 @@ export const createDoctor = async (
   }
 };
 
+/**
+ * Updates an existing doctor.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the result of the update operation.
+ */
 export const updateDoctor = async (
   req: Request,
   res: Response,
@@ -59,6 +75,14 @@ export const updateDoctor = async (
   }
 };
 
+/**
+ * Deletes an existing doctor.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the result of the deletion operation.
+ */
 export const deleteDoctor = async (
   req: Request,
   res: Response,
@@ -73,6 +97,14 @@ export const deleteDoctor = async (
   }
 };
 
+/**
+ * Retrieves a doctor by ID.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<any>} A promise that resolves to the result of the retrieval operation.
+ */
 export const getDoctors = async (
   req: Request,
   res: Response,

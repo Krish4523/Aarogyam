@@ -5,6 +5,13 @@ import bcrypt from "bcrypt";
 import { Doctor, Role } from "@prisma/client";
 import { CreateDoctorDTO, DoctorUpdateDTO, SafeUser } from "../types/user.dto";
 
+/**
+ * Creates a new doctor.
+ *
+ * @param {number} hospitalUserId - The ID of the hospital user creating the doctor.
+ * @param {CreateDoctorDTO} createDoctorDTO - The data transfer object containing doctor creation details.
+ * @returns {Promise<any>} A promise that resolves to the result of the creation operation.
+ */
 export const create = async (
   hospitalUserId: number,
   createDoctorDTO: CreateDoctorDTO
@@ -43,6 +50,13 @@ export const create = async (
   return Format.success(doctor, "Doctor create successfully");
 };
 
+/**
+ * Updates an existing doctor.
+ *
+ * @param {number} userId - The ID of the user to be updated.
+ * @param {DoctorUpdateDTO} doctorUpdateDTO - The data transfer object containing doctor update details.
+ * @returns {Promise<any>} A promise that resolves to the result of the update operation.
+ */
 export const updateDoctor = async (
   userId: number,
   doctorUpdateDTO: DoctorUpdateDTO
@@ -66,6 +80,12 @@ export const updateDoctor = async (
   return Format.success(updatedUser, "Doctor update successfully");
 };
 
+/**
+ * Deletes an existing doctor.
+ *
+ * @param {number} doctorId - The ID of the doctor to be deleted.
+ * @returns {Promise<any>} A promise that resolves to the result of the deletion operation.
+ */
 export const deleteDoctor = async (doctorId: number): Promise<any> => {
   const doctor = (await doctorDao.getDoctor(doctorId)) as Doctor;
   if (!doctor) {
@@ -76,6 +96,12 @@ export const deleteDoctor = async (doctorId: number): Promise<any> => {
   return Format.success({}, "Doctor delete successfully");
 };
 
+/**
+ * Retrieves a doctor by ID.
+ *
+ * @param {number} doctorId - The ID of the doctor to be retrieved.
+ * @returns {Promise<any>} A promise that resolves to the result of the retrieval operation.
+ */
 export const getDoctor = async (doctorId: number): Promise<any> => {
   const doctor = (await doctorDao.getDoctor(doctorId)) as Doctor;
   if (!doctor) {

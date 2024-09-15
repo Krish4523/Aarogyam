@@ -22,6 +22,14 @@ export const UserSignUpSchema = z.object({
  */
 export type UserSignUpDTO = z.infer<typeof UserSignUpSchema>;
 
+/**
+ * Schema for creating a new user.
+ * Extends the UserSignUpSchema with additional fields.
+ *
+ * @property {string} [address] - The address of the user (optional).
+ * @property {string} [profileImage] - The profile image URL of the user (optional).
+ * @property {boolean} [isVerified] - The verification status of the user (optional).
+ */
 const CreateUserSchema = UserSignUpSchema.extend({
   address: z.string().optional(),
   profileImage: z
@@ -35,6 +43,10 @@ const CreateUserSchema = UserSignUpSchema.extend({
   isVerified: z.boolean().optional(),
 });
 
+/**
+ * Type definition for creating a new user.
+ * Inferred from CreateUserSchema.
+ */
 export type CreateUser = z.infer<typeof CreateUserSchema>;
 
 /**
@@ -130,6 +142,18 @@ export const PatientUpdateSchema = UserUpdateSchema.extend({
  * Inferred from PatientUpdateDTOSchema.
  */
 export type PatientUpdateDTO = z.infer<typeof PatientUpdateSchema>;
+
+/**
+ * Schema for creating a new doctor.
+ *
+ * @property {string} name - The name of the doctor.
+ * @property {string} phone - The phone number of the doctor, must be at least 10 characters long.
+ * @property {string} address - The address of the doctor.
+ * @property {string} [profileImage] - The profile image URL of the doctor (optional).
+ * @property {string} email - The email address of the doctor.
+ * @property {string} gender - The gender of the doctor, must be either "MALE" or "FEMALE".
+ * @property {number} rating - The rating of the doctor.
+ */
 export const CreateDoctorSchema = z.object({
   name: z.string(),
   phone: z.string().min(10),
@@ -147,8 +171,20 @@ export const CreateDoctorSchema = z.object({
   rating: z.number(),
 });
 
+/**
+ * Type definition for creating a new doctor.
+ * Inferred from CreateDoctorSchema.
+ */
 export type CreateDoctorDTO = z.infer<typeof CreateDoctorSchema>;
 
+/**
+ * Schema for updating doctor information.
+ * Extends the UserUpdateSchema with additional fields.
+ * At least one field must be provided.
+ *
+ * @property {string} [gender] - The gender of the doctor, must be either "MALE" or "FEMALE" (optional).
+ * @property {number} [rating] - The rating of the doctor (optional).
+ */
 export const DoctorUpdateSchema = UserUpdateSchema.extend({
   gender: z.enum(["MALE", "FEMALE"]).optional(),
   rating: z.number().optional(),
@@ -161,9 +197,8 @@ export const DoctorUpdateSchema = UserUpdateSchema.extend({
   }
 );
 
+/**
+ * Type definition for updating doctor information.
+ * Inferred from DoctorUpdateSchema.
+ */
 export type DoctorUpdateDTO = z.infer<typeof DoctorUpdateSchema>;
-// export type CreateHospitalDTO = UserSignUp & {
-//   name: string;
-//   phone: string;
-//   address: string;
-// };
