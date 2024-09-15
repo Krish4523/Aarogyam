@@ -174,3 +174,53 @@ export const updateUser = async (
     },
   });
 };
+
+export const updateUserForDoctor = async (
+  userId: number,
+  userData: Partial<User>
+): Promise<User> => {
+  return userClient.update({
+    where: {
+      id: userId,
+    },
+    data: userData,
+  });
+};
+
+export const deleteDoctorUser = async (
+  userId: number
+): Promise<User | null> => {
+  return userClient.delete({
+    where: {
+      id: userId,
+    },
+  });
+};
+
+export const deleteHospitalUser = async (
+  userId: number
+): Promise<User | null> => {
+  return userClient.delete({
+    where: {
+      id: userId,
+    },
+  });
+};
+
+export const updateUserForHospital = async (
+  userId: number,
+  name: string,
+  address: string,
+  phone: string
+): Promise<User> => {
+  return userClient.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      name,
+      address,
+      phone,
+    },
+  });
+};

@@ -1,4 +1,4 @@
-import { Role, User } from "@prisma/client";
+import { Doctor, Role, User } from "@prisma/client";
 
 /**
  * Represents the data required for a user to sign up.
@@ -16,6 +16,7 @@ export type UserSignUp = {
   phone: string;
   password: string;
   role: Role;
+  isVerified: boolean;
 };
 
 /**
@@ -24,3 +25,16 @@ export type UserSignUp = {
  * @typedef {Omit<User, "password" | "VerificationToken">} SafeUser
  */
 export type SafeUser = Omit<User, "password" | "VerificationToken">;
+
+export type SafeDoctor = Omit<
+  Doctor,
+  "id" | "createdAt" | "updatedAt" | "hospitalId"
+>;
+
+export type CreateDoctorDTO = UserSignUp & { gender: string; rating: number };
+
+export type CreateHospitalDTO = UserSignUp & {
+  name: string;
+  phone: string;
+  address: string;
+};

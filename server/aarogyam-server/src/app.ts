@@ -5,6 +5,8 @@ import authRouter from "./routers/auth.router";
 import userRouter from "./routers/user.router";
 import patientRouter from "./routers/patient.router";
 import emergencyRouter from "./routers/emergencyContact.router";
+import doctorRouter from "./routers/doctor.router";
+import hospitalRouter from "./routers/hospital.router";
 import cors from "cors";
 import env from "./configs/env";
 
@@ -32,6 +34,8 @@ app.use("/api/main_service/v1/auth", authRouter);
 app.use("/api/main_service/v1/user", userRouter);
 app.use("/api/main_service/v1/patient", patientRouter);
 app.use("/api/main_service/v1/emergency-contact", emergencyRouter);
+app.use("/api/main_service/v1/doctor", doctorRouter);
+app.use("/api/main_service/v1/hospital", hospitalRouter);
 
 app.use(errorMiddleware);
 export default app;

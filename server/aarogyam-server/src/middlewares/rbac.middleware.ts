@@ -1,7 +1,12 @@
 import { Role } from "@prisma/client";
+import { NextFunction, Request, Response } from "express";
 
 export const verifyRole = (roles: Role[]) => {
-  return (req, res, next) => {
+  // @ts-ignore
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(403).send("Not authorized");
+    }
     const userRole = req.user.role;
     if (roles.includes(userRole)) {
       next();
