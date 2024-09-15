@@ -2,29 +2,29 @@ import Format from "../utils/format";
 import * as doctorDao from "../dao/doctor.dao";
 import * as userDao from "../dao/user.dao";
 import bcrypt from "bcrypt";
-import { Doctor, Role } from "@prisma/client";
-import { CreateDoctorDTO, DoctorUpdateDTO, SafeUser } from "../types/user.dto";
+import { Doctor, Hospital, Role, User } from "@prisma/client";
+import { DoctorCreateDTO, DoctorUpdateDTO, SafeUser } from "../types/user.dto";
 
 /**
  * Creates a new doctor.
  *
  * @param {number} hospitalUserId - The ID of the hospital user creating the doctor.
- * @param {CreateDoctorDTO} createDoctorDTO - The data transfer object containing doctor creation details.
+ * @param {DoctorCreateDTO} doctorCreateDTO - The data transfer object containing doctor creation details.
  * @returns {Promise<any>} A promise that resolves to the result of the creation operation.
  */
 export const create = async (
   hospitalUserId: number,
-  createDoctorDTO: CreateDoctorDTO
+  doctorCreateDTO: DoctorCreateDTO
 ): Promise<any> => {
   const existingUser: any = await userDao.findByEmailOrPhone(
-    createDoctorDTO.email,
-    createDoctorDTO.phone
+    doctorCreateDTO.email,
+    doctorCreateDTO.phone
   );
 
   if (existingUser) return Format.conflict(null, "Doctor already exists");
 
-  const { gender, rating, ...userData } = createDoctorDTO;
-  const hashPassword = await bcrypt.hash(createDoctorDTO.name + "@123", 10);
+  const { gender, rating, ...userData } = doctorCreateDTO;
+  const hashPassword = await bcrypt.hash(doctorCreateDTO.name + "@123", 10);
 
   const user = await userDao.create({
     ...userData,
@@ -33,10 +33,10 @@ export const create = async (
     role: Role.DOCTOR,
   });
 
-  const userHospital = await userDao.getUserWithRole(
+  const userHospital = (await userDao.getUserWithRole(
     hospitalUserId,
     Role.HOSPITAL
-  );
+  )) as User & { hospital: Hospital };
 
   if (!userHospital) return Format.notFound("Hospital Not found");
 
@@ -107,7 +107,7 @@ export const getDoctor = async (doctorId: number): Promise<any> => {
   if (!doctor) {
     return Format.notFound("Doctor not found");
   }
-  const { user, gender, rating, id } = doctor;
+  const { user, gender, rating, id } = doctor as Doctor & { user: User };
   const { name, email, phone, address, profileImage } = user as SafeUser;
   return Format.success({
     id,

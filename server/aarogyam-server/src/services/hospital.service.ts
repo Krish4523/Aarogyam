@@ -1,112 +1,109 @@
 import Format from "../utils/format";
-import { CreateHospitalDTO } from "../types/user";
+import {
+  HospitalCreateDTO,
+  HospitalUpdateDTO,
+  SafeUser,
+} from "../types/user.dto";
 import * as hospitalDao from "../dao/hospital.dao";
 import * as userDao from "../dao/user.dao";
 import bcrypt from "bcrypt";
-import { Role, User } from "@prisma/client";
+import { Hospital, Role, User } from "@prisma/client";
 
-export const getUserIdByHospitalId = async (
-  hospitalId: number
-): Promise<number | null> => {
-  const user = await hospitalDao.findUserByHospitalId(hospitalId);
-  return user ? user.userId : null;
-};
-
-export const getHospitalIdByUserId = async (
-  userId: number
-): Promise<number | null> => {
-  const hospital = await hospitalDao.findUserByUserId(userId);
-  return hospital ? hospital.id : null;
-};
-
+/**
+ * Creates a new hospital.
+ *
+ * @param {HospitalCreateDTO} hospitalCreateDTO - The data transfer object containing hospital creation details.
+ * @returns {Promise<any>} A promise that resolves to the result of the creation operation.
+ */
 export const createHospital = async (
-  hospitalData: CreateHospitalDTO
+  hospitalCreateDTO: HospitalCreateDTO
 ): Promise<any> => {
-  if (!hospitalData) {
-    return Format.notFound("Hospital data is not found");
-  }
-  if (
-    !hospitalData.name ||
-    !hospitalData.address ||
-    !hospitalData.phone ||
-    !hospitalData.email
-  ) {
-    return Format.notFound("All Field Required!");
-  }
   const existingUser: any = await userDao.findByEmailOrPhone(
-    hospitalData.email,
-    hospitalData.phone
+    hospitalCreateDTO.email,
+    hospitalCreateDTO.phone
   );
 
-  if (existingUser) return Format.conflict(null, "Doctor already exists");
+  if (existingUser) return Format.conflict(null, "Hospital already exists");
 
-  const hashPassword = await bcrypt.hash(hospitalData.name + "@123", 10);
+  const hashPassword = await bcrypt.hash(hospitalCreateDTO.name + "@123", 10);
+
+  const { website, ...userData } = hospitalCreateDTO;
 
   const user: User = await userDao.create({
-    name: hospitalData.name,
-    email: hospitalData.email,
-    phone: hospitalData.phone,
+    ...userData,
     password: hashPassword,
     isVerified: true,
     role: Role.HOSPITAL,
   });
 
-  const hospital = await hospitalDao.create(user.id, hospitalData);
+  const hospital = await hospitalDao.create(user.id, website);
   return Format.success(hospital, "Hospital create successfully");
 };
 
+/**
+ * Deletes an existing hospital.
+ *
+ * @param {number} hospitalId - The ID of the hospital to be deleted.
+ * @returns {Promise<any>} A promise that resolves to the result of the deletion operation.
+ */
 export const deleteHospital = async (hospitalId: number): Promise<any> => {
-  if (!hospitalId) {
-    return Format.notFound("Doctor not found");
+  const hospital = await hospitalDao.findHospitalByID(hospitalId);
+  if (!hospital) {
+    return Format.notFound("Hospital not Found!");
   }
-  const userId = await getUserIdByHospitalId(hospitalId);
-  if (!userId) {
-    return Format.notFound("User not Found!");
-  }
-  const deletedHospital = await hospitalDao.deleteHospital(hospitalId);
-  const deleteUser = await userDao.deleteHospitalUser(userId);
-  return Format.success(
-    { deleteUser, deletedHospital },
-    "Hospital delete successfully"
-  );
+  await hospitalDao.deleteHospital(hospitalId);
+  await userDao.deleteUser(hospital.userId);
+  return Format.success({}, "Hospital delete successfully");
 };
 
+/**
+ * Retrieves a hospital by ID.
+ *
+ * @param {number} hospitalId - The ID of the hospital to be retrieved.
+ * @returns {Promise<any>} A promise that resolves to the result of the retrieval operation.
+ */
 export const getHospital = async (hospitalId: number): Promise<any> => {
-  if (!hospitalId) {
-    return Format.notFound("Doctor not found");
-  }
-  const doctors = await hospitalDao.getHospital(hospitalId);
-  return Format.success(doctors, "Hospital Data");
-};
-
-export const updateHospital = async (
-  userId: number,
-  hospitalData: CreateHospitalDTO
-): Promise<any> => {
-  if (!hospitalData) {
-    return Format.badRequest(null, "No data provided for update");
-  }
-  const exitsingHospital = await userDao.findByID(userId);
-  if (!exitsingHospital) {
-    return Format.notFound("User not found");
-  }
-  const updatedUser = await userDao.updateUserForHospital(
-    userId,
-    hospitalData.name,
-    hospitalData.address,
-    hospitalData.phone
-  );
-
-  const hospitalId = await getHospitalIdByUserId(userId);
-  if (!hospitalId) {
+  const hospital = await hospitalDao.getHospitalWithUser(hospitalId);
+  if (!hospital) {
     return Format.notFound("Hospital not found");
   }
-  const updatedHospital = await hospitalDao.updateHospital(
-    hospitalId,
-    hospitalData
-  );
-  return Format.success(
-    { updatedHospital, updatedUser },
-    "Doctor update successfully"
-  );
+
+  const { user, website, id } = hospital as Hospital & { user: User };
+  const { name, email, phone, address, profileImage } = user as SafeUser;
+  return Format.success({
+    id,
+    name,
+    email,
+    phone,
+    address,
+    profileImage,
+    website,
+  });
+};
+
+/**
+ * Updates an existing hospital.
+ *
+ * @param {number} userId - The ID of the user associated with the hospital.
+ * @param {HospitalUpdateDTO} hospitalData - The data transfer object containing hospital update details.
+ * @returns {Promise<any>} A promise that resolves to the result of the update operation.
+ */
+export const updateHospital = async (
+  userId: number,
+  hospitalData: HospitalUpdateDTO
+): Promise<any> => {
+  const existingHospital = await hospitalDao.findHospitalByUserID(userId);
+  if (!existingHospital) {
+    return Format.notFound("Hospital not found");
+  }
+
+  const { website, ...userData } = hospitalData;
+
+  if (userData) await userDao.updateUser(userId, userData);
+
+  if (website) await hospitalDao.updateHospital(userId, website);
+
+  const updatedUser = await userDao.getUserWithRole(userId, Role.HOSPITAL);
+
+  return Format.success(updatedUser, "Hospital update successfully");
 };

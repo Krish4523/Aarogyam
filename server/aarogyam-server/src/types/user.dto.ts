@@ -154,7 +154,7 @@ export type PatientUpdateDTO = z.infer<typeof PatientUpdateSchema>;
  * @property {string} gender - The gender of the doctor, must be either "MALE" or "FEMALE".
  * @property {number} rating - The rating of the doctor.
  */
-export const CreateDoctorSchema = z.object({
+export const DoctorCreateSchema = z.object({
   name: z.string(),
   phone: z.string().min(10),
   address: z.string(),
@@ -175,7 +175,7 @@ export const CreateDoctorSchema = z.object({
  * Type definition for creating a new doctor.
  * Inferred from CreateDoctorSchema.
  */
-export type CreateDoctorDTO = z.infer<typeof CreateDoctorSchema>;
+export type DoctorCreateDTO = z.infer<typeof DoctorCreateSchema>;
 
 /**
  * Schema for updating doctor information.
@@ -202,3 +202,34 @@ export const DoctorUpdateSchema = UserUpdateSchema.extend({
  * Inferred from DoctorUpdateSchema.
  */
 export type DoctorUpdateDTO = z.infer<typeof DoctorUpdateSchema>;
+
+export const HospitalCreateSchema = z.object({
+  name: z.string(),
+  phone: z.string().min(10),
+  address: z.string(),
+  profileImage: z
+    .string()
+    .optional()
+    .transform((path) => {
+      if (!path) return path;
+      const relativePath = path.split("public")[1];
+      return `${relativePath.replace(/\\/g, "/")}`;
+    }),
+  email: z.string().email(),
+  website: z.string().url().optional(),
+});
+
+export type HospitalCreateDTO = z.infer<typeof HospitalCreateSchema>;
+
+export const HospitalUpdateSchema = UserUpdateSchema.extend({
+  website: z.string().url().optional(),
+}).refine(
+  (data) => {
+    return Object.values(data).some((value) => value !== undefined);
+  },
+  {
+    message: "At least one field must be provided.",
+  }
+);
+
+export type HospitalUpdateDTO = z.infer<typeof HospitalUpdateSchema>;

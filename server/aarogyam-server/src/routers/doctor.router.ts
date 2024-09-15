@@ -20,7 +20,12 @@ router.use(verifyJWT);
  * Route to create a new doctor.
  * Only accessible by users with the HOSPITAL role.
  */
-router.post("", verifyRole([Role.HOSPITAL]), doctorController.createDoctor);
+router.post(
+  "",
+  verifyRole([Role.HOSPITAL]),
+  upload.single("profileImage"),
+  doctorController.createDoctor
+);
 
 /**
  * Route to get doctor details by ID.

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import * as doctorService from "../services/doctor.service";
 import {
-  CreateDoctorSchema,
+  DoctorCreateSchema,
   DoctorUpdateSchema,
   SafeUser,
 } from "../types/user.dto";
@@ -23,7 +23,7 @@ export const createDoctor = async (
   try {
     const user = req.user as SafeUser;
     // Validate the request body against the CreateDoctorSchema
-    const validation = CreateDoctorSchema.safeParse({
+    const validation = DoctorCreateSchema.safeParse({
       ...req.body,
       profileImage: req.file?.path,
     });

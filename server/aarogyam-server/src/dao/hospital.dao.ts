@@ -1,24 +1,33 @@
 import { Hospital, PrismaClient } from "@prisma/client";
-import { CreateHospitalDTO } from "../types/user";
 
 const hospital = new PrismaClient().hospital;
 
+/**
+ * Creates a new hospital record in the database.
+ *
+ * @param {number} userId - The ID of the user associated with the hospital.
+ * @param {string | undefined} website - The website of the hospital.
+ * @returns {Promise<Hospital>} A promise that resolves to the created hospital.
+ */
 export const create = async (
   userId: number,
-  hospitalData: CreateHospitalDTO
+  website: string | undefined
 ): Promise<Hospital> => {
   return hospital.create({
     data: {
       userId,
-      name: hospitalData.name,
-      phone: hospitalData.phone,
-      address: hospitalData.address,
-      isApproved: true,
+      website,
     },
   });
 };
 
-export const findUserByHospitalId = async (
+/**
+ * Finds a hospital by its ID.
+ *
+ * @param {number} hospitalId - The ID of the hospital.
+ * @returns {Promise<Hospital | null>} A promise that resolves to the hospital if found, otherwise null.
+ */
+export const findHospitalByID = async (
   hospitalId: number
 ): Promise<Hospital | null> => {
   return hospital.findUnique({
@@ -26,30 +35,60 @@ export const findUserByHospitalId = async (
   });
 };
 
+/**
+ * Deletes a hospital record from the database.
+ *
+ * @param {number} hospitalId - The ID of the hospital to be deleted.
+ * @returns {Promise<Hospital>} A promise that resolves to the deleted hospital.
+ */
 export const deleteHospital = async (hospitalId: number): Promise<Hospital> => {
   return hospital.delete({ where: { id: hospitalId } });
 };
 
-export const getHospital = async (
+/**
+ * Retrieves a hospital by its ID, including the associated user.
+ *
+ * @param {number} hospitalId - The ID of the hospital.
+ * @returns {Promise<Hospital | null>} A promise that resolves to the hospital if found, otherwise null.
+ */
+export const getHospitalWithUser = async (
   hospitalId: number
 ): Promise<Hospital | null> => {
-  return hospital.findUnique({ where: { id: hospitalId } });
-};
-
-export const updateHospital = async (
-  hospitalId: number,
-  hospitalData: CreateHospitalDTO
-): Promise<Hospital> => {
-  return hospital.update({
+  return hospital.findUnique({
     where: { id: hospitalId },
-    data: hospitalData,
+    include: { user: true },
   });
 };
 
-export const findUserByUserId = async (
+/**
+ * Updates a hospital record in the database.
+ *
+ * @param {number} userId - The ID of the user associated with the hospital.
+ * @param {string} website - The new website of the hospital.
+ * @returns {Promise<Hospital>} A promise that resolves to the updated hospital.
+ */
+export const updateHospital = async (
+  userId: number,
+  website: string
+): Promise<Hospital> => {
+  return hospital.update({
+    where: { userId },
+    data: { website },
+  });
+};
+
+/**
+ * Finds a hospital by the user ID.
+ *
+ * @param {number} userId - The ID of the user associated with the hospital.
+ * @returns {Promise<Hospital>} A promise that resolves to the hospital if found.
+ */
+export const findHospitalByUserID = (
   userId: number
 ): Promise<Hospital | null> => {
   return hospital.findUnique({
-    where: { userId },
+    where: {
+      userId,
+    },
   });
 };
