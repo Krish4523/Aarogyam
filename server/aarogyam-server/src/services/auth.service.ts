@@ -75,6 +75,7 @@ export async function signUp({
     email,
     phone,
     password: hashPassword,
+    isVerified: false,
     role: Role.PATIENT,
   });
 
