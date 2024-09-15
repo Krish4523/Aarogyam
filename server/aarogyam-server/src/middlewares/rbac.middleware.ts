@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
+import Format from "../utils/format";
 
 /**
  * Middleware to verify if the user has one of the specified roles.
@@ -14,7 +15,9 @@ export const verifyRole = (roles: Role[]) => {
     if (roles.includes(userRole!)) {
       next();
     } else {
-      return res.status(401).json("You don't have permission");
+      return res
+        .status(401)
+        .json(Format.unAuthorized("You don't have permission"));
     }
   };
 };

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as patientService from "../services/patient.service";
-import { PatientUpdateDTOSchema, SafeUser } from "../types/user.dto";
+import { PatientUpdateSchema, SafeUser } from "../types/user.dto";
 import Format from "../utils/format";
 
 /**
@@ -21,7 +21,7 @@ export const updatePatient = async (
     const user: SafeUser = req.user as SafeUser;
 
     // Validate the request body against the PatientUpdateDTOSchema
-    const validation = PatientUpdateDTOSchema.safeParse({
+    const validation = PatientUpdateSchema.safeParse({
       ...req.body,
       profileImage: req.file?.path,
     });

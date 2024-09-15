@@ -153,13 +153,13 @@ model Doctor {
   id         Int      @id @default(autoincrement())
   userId     Int      @unique
   gender     String
-  hospitalId Int?
+  hospitalId Int
   rating     Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   user             User                  @relation(fields: [userId], references: [id])
-  hospital         Hospital?             @relation(fields: [hospitalId], references: [id])
+  hospital         Hospital              @relation(fields: [hospitalId], references: [id])
   medicalRecords   MedicalRecord[]
   prescriptions    Prescription[]
   specialties      SpecialtiesOnDoctor[]

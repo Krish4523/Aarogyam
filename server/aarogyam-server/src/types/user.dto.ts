@@ -22,6 +22,21 @@ export const UserSignUpSchema = z.object({
  */
 export type UserSignUpDTO = z.infer<typeof UserSignUpSchema>;
 
+const CreateUserSchema = UserSignUpSchema.extend({
+  address: z.string().optional(),
+  profileImage: z
+    .string()
+    .optional()
+    .transform((path) => {
+      if (!path) return path;
+      const relativePath = path.split("public")[1];
+      return `${relativePath.replace(/\\/g, "/")}`;
+    }),
+  isVerified: z.boolean().optional(),
+});
+
+export type CreateUser = z.infer<typeof CreateUserSchema>;
+
 /**
  * Schema for validating user login information.
  * Either email or phone must be provided.
@@ -78,7 +93,7 @@ export type SafeUser = {
  * @property {string} [address] - The address of the user (optional).
  * @property {string} [profileImage] - The profile image URL of the user (optional).
  */
-const UserUpdateDTOSchema = z.object({
+const UserUpdateSchema = z.object({
   name: z.string().optional(),
   phone: z.string().min(10).optional(),
   address: z.string().optional(),
@@ -99,7 +114,7 @@ const UserUpdateDTOSchema = z.object({
  *
  * @property {string} [gender] - The gender of the patient, must be either "MALE" or "FEMALE" (optional).
  */
-export const PatientUpdateDTOSchema = UserUpdateDTOSchema.extend({
+export const PatientUpdateSchema = UserUpdateSchema.extend({
   gender: z.enum(["MALE", "FEMALE"]).optional(),
 }).refine(
   (data) => {
@@ -114,4 +129,41 @@ export const PatientUpdateDTOSchema = UserUpdateDTOSchema.extend({
  * Type definition for patient update data transfer object.
  * Inferred from PatientUpdateDTOSchema.
  */
-export type PatientUpdateDTO = z.infer<typeof PatientUpdateDTOSchema>;
+export type PatientUpdateDTO = z.infer<typeof PatientUpdateSchema>;
+export const CreateDoctorSchema = z.object({
+  name: z.string(),
+  phone: z.string().min(10),
+  address: z.string(),
+  profileImage: z
+    .string()
+    .optional()
+    .transform((path) => {
+      if (!path) return path;
+      const relativePath = path.split("public")[1];
+      return `${relativePath.replace(/\\/g, "/")}`;
+    }),
+  email: z.string().email(),
+  gender: z.enum(["MALE", "FEMALE"]),
+  rating: z.number(),
+});
+
+export type CreateDoctorDTO = z.infer<typeof CreateDoctorSchema>;
+
+export const DoctorUpdateSchema = UserUpdateSchema.extend({
+  gender: z.enum(["MALE", "FEMALE"]).optional(),
+  rating: z.number().optional(),
+}).refine(
+  (data) => {
+    return Object.values(data).some((value) => value !== undefined);
+  },
+  {
+    message: "At least one field must be provided.",
+  }
+);
+
+export type DoctorUpdateDTO = z.infer<typeof DoctorUpdateSchema>;
+// export type CreateHospitalDTO = UserSignUp & {
+//   name: string;
+//   phone: string;
+//   address: string;
+// };

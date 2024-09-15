@@ -1,5 +1,5 @@
 import { PrismaClient, Role, User } from "@prisma/client";
-import { UserSignUpDTO } from "../types/user.dto";
+import { CreateUser } from "../types/user.dto";
 
 const userClient = new PrismaClient().user;
 
@@ -28,7 +28,7 @@ export const findByEmailOrPhone = async (
  * @returns A promise that resolves to the created user.
  */
 export const create = async (
-  user: UserSignUpDTO & { role: Role }
+  user: CreateUser & { role: Role }
 ): Promise<User> => {
   return userClient.create({
     data: user,
@@ -182,52 +182,10 @@ export const updateUser = async (
   });
 };
 
-export const updateUserForDoctor = async (
-  userId: number,
-  userData: Partial<User>
-): Promise<User> => {
-  return userClient.update({
-    where: {
-      id: userId,
-    },
-    data: userData,
-  });
-};
-
-export const deleteDoctorUser = async (
-  userId: number
-): Promise<User | null> => {
+export const deleteUser = async (userId: number): Promise<User | null> => {
   return userClient.delete({
     where: {
       id: userId,
-    },
-  });
-};
-
-export const deleteHospitalUser = async (
-  userId: number
-): Promise<User | null> => {
-  return userClient.delete({
-    where: {
-      id: userId,
-    },
-  });
-};
-
-export const updateUserForHospital = async (
-  userId: number,
-  name: string,
-  address: string,
-  phone: string
-): Promise<User> => {
-  return userClient.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      name,
-      address,
-      phone,
     },
   });
 };
