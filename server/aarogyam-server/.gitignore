@@ -156,3 +156,6 @@ Thumbs.db
 /.env
 /.env.production
 /src/uploads/
+
+uploads
+public

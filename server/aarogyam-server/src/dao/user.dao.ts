@@ -1,5 +1,5 @@
-import { PrismaClient, User } from "@prisma/client";
-import { SafeUser, UserSignUp } from "../types/user";
+import { PrismaClient, Role, User } from "@prisma/client";
+import { UserSignUpDTO } from "../types/user.dto";
 
 const userClient = new PrismaClient().user;
 
@@ -11,12 +11,12 @@ const userClient = new PrismaClient().user;
  * @returns A promise that resolves to the found user or null if no user is found.
  */
 export const findByEmailOrPhone = async (
-  email: string | null,
-  phone: string | null
+  email: string | undefined,
+  phone: string | undefined
 ): Promise<User | null> => {
   return userClient.findFirst({
     where: {
-      OR: [{ email: email || undefined }, { phone: phone || undefined }],
+      OR: [{ email }, { phone }],
     },
   });
 };
@@ -27,7 +27,9 @@ export const findByEmailOrPhone = async (
  * @param user - The user data to create.
  * @returns A promise that resolves to the created user.
  */
-export const create = async (user: UserSignUp): Promise<User> => {
+export const create = async (
+  user: UserSignUpDTO & { role: Role }
+): Promise<User> => {
   return userClient.create({
     data: user,
   });
@@ -51,14 +53,32 @@ export const updateIsVerified = async (id: number): Promise<User> => {
 };
 
 /**
+ * Retrieves a user along with their role-specific information.
+ *
+ * @param id - The ID of the user.
+ * @param role - The role of the user (e.g., PATIENT, DOCTOR, HOSPITAL).
+ * @returns A promise that resolves to the user with their role-specific information or null if not found.
+ */
+export async function getUserWithRole(id: number, role: Role) {
+  return userClient.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      patient: role === Role.PATIENT,
+      doctor: role === Role.DOCTOR,
+      hospital: role === Role.HOSPITAL,
+    },
+  });
+}
+
+/**
  * Finds a safe user by their ID.
  *
  * @param id - The ID of the user to find.
  * @returns A promise that resolves to the found user or null if no user is found.
  */
-export const findSafeUserByID = async (
-  id: number
-): Promise<SafeUser | null> => {
+export const findSafeUserByID = async (id: number): Promise<any> => {
   return userClient.findUnique({
     where: {
       id,
@@ -72,8 +92,6 @@ export const findSafeUserByID = async (
       address: true,
       profileImage: true,
       isVerified: true,
-      createdAt: true,
-      updatedAt: true,
     },
   });
 };
@@ -148,29 +166,18 @@ export const resetPassword = async (
 /**
  * Updates the user information.
  *
- * @param name
- * @param phone
- * @param address
- * @param profileImage
  * @param id - The ID of the user to update.
+ * @param data - The data to update.
  * @returns A promise that resolves to the updated user.
  */
 export const updateUser = async (
-  name: string,
-  phone: string,
-  address: string | null,
-  profileImage: string | null,
-  id: number
+  id: number,
+  data: Partial<User>
 ): Promise<User> => {
   return userClient.update({
     where: {
       id,
     },
-    data: {
-      name,
-      phone,
-      address,
-      profileImage,
-    },
+    data,
   });
 };

@@ -1,32 +1,34 @@
 import * as patientDao from "../dao/patient.dao";
 import Format from "../utils/format";
-import { Patient, User } from "@prisma/client";
 import * as userDao from "../dao/user.dao";
+import { PatientUpdateDTO, SafeUser } from "../types/user.dto";
 
+/**
+ * Updates patient information including user data and gender.
+ *
+ * @param {SafeUser} user - The user object containing user details.
+ * @param {PatientUpdateDTO} patientUpdateDTO - The data transfer object containing patient update details.
+ * @returns {Promise<any>} A promise that resolves to the result of the update operation.
+ */
 export const updatePatient = async (
-  userId: number,
-  patientData: Partial<Patient>,
-  userData: Partial<User>
+  user: SafeUser,
+  patientUpdateDTO: PatientUpdateDTO
 ): Promise<any> => {
-  if (!patientData || !userData) {
-    return Format.badRequest(null, "No data provided for update");
-  }
-  const existingUser = await userDao.findByID(userId);
+  // Destructure gender from patientUpdateDTO and get the rest of the user data
+  const { gender, ...userData } = patientUpdateDTO;
 
-  const existingPatient = await patientDao.findPatientByUserId(userId);
-  if (!existingPatient || !existingUser) {
-    return Format.notFound("Patient not found");
-  }
-  const updatedUser = await userDao.updateUser(
-    userData.name!,
-    userData.phone!,
-    userData.address!,
-    userData.profileImage!,
-    userData.id!
-  );
-  const updatedPatient = await patientDao.updatePatient(userId, patientData);
+  // If userData is provided, update the user information
+  if (userData) await userDao.updateUser(user.id, userData);
+
+  // If gender is provided, update the patient's gender
+  if (gender) await patientDao.updatePatient(user.id, { gender });
+
+  // Retrieve the updated user information with role
+  const updatedUser = await userDao.getUserWithRole(user.id, user.role);
+
+  // Return success response with the updated user information
   return Format.success(
-    { updatedPatient, updatedUser },
+    updatedUser,
     "Patient information updated successfully"
   );
 };
