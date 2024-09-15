@@ -55,7 +55,7 @@ export const updateUser = async (
     return Format.notFound("User not found");
   }
   if (!profileImage) {
-    profileImage = existingUser.profile_image;
+    profileImage = existingUser.profileImage;
   }
   await userDao.updateUser(
     name || existingUser.name,

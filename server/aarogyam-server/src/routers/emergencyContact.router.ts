@@ -2,7 +2,7 @@ import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware";
 import { verifyRole } from "../middlewares/rbac.middleware";
 import { Role } from "@prisma/client";
-import * as patientController from "../controllers/patient.controller";
+import * as emergencyContactController from "../controllers/emergencyContact.controller";
 
 const router: Router = Router();
 
@@ -10,15 +10,12 @@ const router: Router = Router();
 router.use(verifyJWT);
 router.use(verifyRole([Role.PATIENT]));
 
-// create,edit patient  --Done
-// add/remove/edit emergency contact --Done
+router.post("", emergencyContactController.addEmergencyContact);
 
-// medical record router (add/edit/get/(get/key))
-// Doctor router (CRUD) | Appointment Slot (CRUD)
-// Hospital (CRUD)
-// admin router (add hospital)
-// appointment router (CRUD)
+router.patch("", emergencyContactController.updateEmergencyContact);
 
-router.patch("", patientController.updatePatient);
+router.delete("/:id", emergencyContactController.deleteEmergencyContact);
+
+router.get("", emergencyContactController.getEmergencyContacts);
 
 export default router;

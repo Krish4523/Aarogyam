@@ -4,6 +4,7 @@ import errorMiddleware from "./middlewares/error.middleware";
 import authRouter from "./routers/auth.router";
 import userRouter from "./routers/user.router";
 import patientRouter from "./routers/patient.router";
+import emergencyRouter from "./routers/emergencyContact.router";
 import cors from "cors";
 import env from "./configs/env";
 
@@ -30,6 +31,7 @@ app.get("/api/main_service", (req: Request, res: Response) => {
 app.use("/api/main_service/v1/auth", authRouter);
 app.use("/api/main_service/v1/user", userRouter);
 app.use("/api/main_service/v1/patient", patientRouter);
+app.use("/api/main_service/v1/emergency-contact", emergencyRouter);
 
 app.use(errorMiddleware);
 export default app;
