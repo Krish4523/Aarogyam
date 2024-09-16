@@ -174,7 +174,7 @@ export const addMedicalRecordFile = async (
 ): Promise<any> => {
   try {
     const validation = MedicalRecordFileSchema.safeParse({
-      ...req.body,
+      medicalRecordId: parseInt(req.body.medicalRecordId, 10),
       name: req.file?.originalname,
       url: req.file?.path,
     });
