@@ -27,7 +27,7 @@ export const createAppointmentSlot = async (
     appointmentSlotDTO.endTime
   );
 
-  if (!isSlotAvailable) {
+  if (isSlotAvailable) {
     return Format.badRequest(
       "An appointment slot is already booked or unavailable in this time range."
     );

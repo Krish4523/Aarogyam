@@ -28,7 +28,6 @@ export const checkSlotAvailability = async (
     where: {
       doctorId,
       date,
-      status: "AVAILABLE",
       OR: [
         {
           startTime: {

@@ -252,14 +252,14 @@ model MedicalExamination {
 model Prescription {
   id        Int      @id @default(autoincrement())
   patientId Int
-  doctorId  Int
+  doctorId  Int // doctor id --> get from user id
   date      DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   patient   Patient      @relation(fields: [patientId], references: [id])
   doctor    Doctor       @relation(fields: [doctorId], references: [id])
-  medicines Medication[]
+  medicines Medication[] // add patient id from prescription to medicine using loop
   notes     String?
 
   @@map("prescriptions")
