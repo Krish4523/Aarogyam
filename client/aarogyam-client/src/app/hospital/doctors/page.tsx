@@ -51,7 +51,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { AddDoctorSchema } from "@/utils/validations/AddDoctor";
+import { AddDoctorSchema } from "@/utils/validations/AddDoctorSchema";
 
 interface DoctorInfo {
   id: number;
@@ -147,6 +147,18 @@ function Page() {
     setIsDialogOpen(true);
   };
 
+  const handleAddDoctorClick = () => {
+    setEditingDoctor(null);
+    form.reset({
+      name: "",
+      email: "",
+      phone: "",
+      specialities: [],
+      gender: undefined,
+    });
+    setIsDialogOpen(true);
+  };
+
   const onSubmit = (values: z.infer<typeof AddDoctorSchema>) => {
     if (editingDoctor) {
       // Update existing doctor
@@ -183,7 +195,9 @@ function Page() {
         <h1 className="text-2xl font-bold">Doctors</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm">Add Doctor</Button>
+            <Button size="sm" onClick={handleAddDoctorClick}>
+              Add Doctor
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

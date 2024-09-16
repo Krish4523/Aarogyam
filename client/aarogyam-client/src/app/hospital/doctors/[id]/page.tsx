@@ -78,8 +78,7 @@ export default function DoctorPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchDoctor = async () => {
       try {
-        // Uncomment the following lines to use real API call
-        // const response = await axios.get(`/api/doctors/${id}`)
+        // const response = await axios.get(`/api/doctor/${id}`)
         // setDoctor(response.data)
 
         // Using dummy data for now

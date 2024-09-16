@@ -21,7 +21,7 @@ function HospitalLayout({ children }: { children: ReactNode }) {
     {
       text: "Doctors",
       icon: <BriefcaseMedical size={24} />,
-      href: "/hospital/doctors",
+      href: "/hospital/doctor",
     },
   ];
 
