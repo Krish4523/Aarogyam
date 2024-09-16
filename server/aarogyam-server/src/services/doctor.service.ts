@@ -2,8 +2,30 @@ import Format from "../utils/format";
 import * as doctorDao from "../dao/doctor.dao";
 import * as userDao from "../dao/user.dao";
 import bcrypt from "bcrypt";
-import { Doctor, Hospital, Role, User } from "@prisma/client";
+import { Doctor, Hospital, Role, Speciality, User } from "@prisma/client";
 import { DoctorCreateDTO, DoctorUpdateDTO, SafeUser } from "../types/user.dto";
+import { upsertSpeciality } from "../dao/speciality.dao";
+
+/**
+ * Retrieves the IDs of the given specialties.
+ *
+ * @param {string[]} specialties - An array of specialty names.
+ * @returns {Promise<number[]>} A promise that resolves to an array of specialty IDs.
+ */
+const getSpecialityIds = async (specialties: string[]): Promise<number[]> => {
+  // Normalize the specialties (convert to lowercase and trim any whitespace)
+  const normalizedSpecialties = specialties.map((s) => s.trim().toLowerCase());
+
+  // Array to store the specialties ids
+  const specialtiesIds: number[] = [];
+
+  for (const specialty of normalizedSpecialties) {
+    const specialtyRecord = await upsertSpeciality(specialty);
+    specialtiesIds.push(specialtyRecord.id);
+  }
+
+  return specialtiesIds;
+};
 
 /**
  * Creates a new doctor.
@@ -23,7 +45,7 @@ export const create = async (
 
   if (existingUser) return Format.conflict(null, "Doctor already exists");
 
-  const { gender, rating, ...userData } = doctorCreateDTO;
+  const { gender, rating, specialties, ...userData } = doctorCreateDTO;
   const hashPassword = await bcrypt.hash(doctorCreateDTO.name + "@123", 10);
 
   const user = await userDao.create({
@@ -32,6 +54,8 @@ export const create = async (
     isVerified: true,
     role: Role.DOCTOR,
   });
+
+  const specialtiesIds = await getSpecialityIds(specialties);
 
   const userHospital = (await userDao.getUserWithRole(
     hospitalUserId,
@@ -44,7 +68,8 @@ export const create = async (
     userHospital.hospital.id,
     user.id,
     gender,
-    rating
+    rating,
+    specialtiesIds
   );
 
   return Format.success(doctor, "Doctor create successfully");
@@ -66,14 +91,20 @@ export const updateDoctor = async (
     return Format.notFound("User not found");
   }
 
-  const { gender, rating, ...userData } = doctorUpdateDTO;
+  const { gender, rating, specialties, ...userData } = doctorUpdateDTO;
+
+  const specialtiesIds = await getSpecialityIds(specialties);
 
   if (userData) await userDao.updateUser(userId, userData);
   if (gender || rating)
-    await doctorDao.updateDoctor(userId, {
-      ...(gender && { gender }),
-      ...(rating && { rating }),
-    });
+    await doctorDao.updateDoctor(
+      userId,
+      {
+        ...(gender && { gender }),
+        ...(rating && { rating }),
+      },
+      specialtiesIds
+    );
 
   const updatedUser = await userDao.getUserWithRole(userId, Role.DOCTOR);
 
@@ -107,7 +138,11 @@ export const getDoctor = async (doctorId: number): Promise<any> => {
   if (!doctor) {
     return Format.notFound("Doctor not found");
   }
-  const { user, gender, rating, id } = doctor as Doctor & { user: User };
+  const { user, specialties, gender, rating, id } = doctor as Doctor & {
+    user: User;
+  } & {
+    specialties: Speciality[];
+  };
   const { name, email, phone, address, profileImage } = user as SafeUser;
   return Format.success({
     id,
@@ -118,5 +153,6 @@ export const getDoctor = async (doctorId: number): Promise<any> => {
     profileImage,
     gender,
     rating,
+    specialties,
   });
 };

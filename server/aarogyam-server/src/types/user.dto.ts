@@ -121,7 +121,7 @@ const UserUpdateSchema = z.object({
 
 /**
  * Schema for validating patient update information.
- * Extends the UserUpdateDTOSchema with an additional gender field.
+ * Extends the UserUpdateSchema with an additional gender field.
  * At least one field must be provided.
  *
  * @property {string} [gender] - The gender of the patient, must be either "MALE" or "FEMALE" (optional).
@@ -139,7 +139,7 @@ export const PatientUpdateSchema = UserUpdateSchema.extend({
 
 /**
  * Type definition for patient update data transfer object.
- * Inferred from PatientUpdateDTOSchema.
+ * Inferred from PatientUpdateSchema.
  */
 export type PatientUpdateDTO = z.infer<typeof PatientUpdateSchema>;
 
@@ -153,6 +153,7 @@ export type PatientUpdateDTO = z.infer<typeof PatientUpdateSchema>;
  * @property {string} email - The email address of the doctor.
  * @property {string} gender - The gender of the doctor, must be either "MALE" or "FEMALE".
  * @property {number} rating - The rating of the doctor.
+ * @property {string[]} specialties - An array of specialties of the doctor.
  */
 export const DoctorCreateSchema = z.object({
   name: z.string(),
@@ -169,11 +170,12 @@ export const DoctorCreateSchema = z.object({
   email: z.string().email(),
   gender: z.enum(["MALE", "FEMALE"]),
   rating: z.number(),
+  specialties: z.string().array(),
 });
 
 /**
  * Type definition for creating a new doctor.
- * Inferred from CreateDoctorSchema.
+ * Inferred from DoctorCreateSchema.
  */
 export type DoctorCreateDTO = z.infer<typeof DoctorCreateSchema>;
 
@@ -184,18 +186,13 @@ export type DoctorCreateDTO = z.infer<typeof DoctorCreateSchema>;
  *
  * @property {string} [gender] - The gender of the doctor, must be either "MALE" or "FEMALE" (optional).
  * @property {number} [rating] - The rating of the doctor (optional).
+ * @property {string[]} specialties - An array of specialties of the doctor.
  */
 export const DoctorUpdateSchema = UserUpdateSchema.extend({
   gender: z.enum(["MALE", "FEMALE"]).optional(),
   rating: z.number().optional(),
-}).refine(
-  (data) => {
-    return Object.values(data).some((value) => value !== undefined);
-  },
-  {
-    message: "At least one field must be provided.",
-  }
-);
+  specialties: z.string().array(),
+});
 
 /**
  * Type definition for updating doctor information.
@@ -203,6 +200,16 @@ export const DoctorUpdateSchema = UserUpdateSchema.extend({
  */
 export type DoctorUpdateDTO = z.infer<typeof DoctorUpdateSchema>;
 
+/**
+ * Schema for creating a new hospital.
+ *
+ * @property {string} name - The name of the hospital.
+ * @property {string} phone - The phone number of the hospital, must be at least 10 characters long.
+ * @property {string} address - The address of the hospital.
+ * @property {string} [profileImage] - The profile image URL of the hospital (optional).
+ * @property {string} email - The email address of the hospital.
+ * @property {string} [website] - The website URL of the hospital (optional).
+ */
 export const HospitalCreateSchema = z.object({
   name: z.string(),
   phone: z.string().min(10),
@@ -219,8 +226,19 @@ export const HospitalCreateSchema = z.object({
   website: z.string().url().optional(),
 });
 
+/**
+ * Type definition for creating a new hospital.
+ * Inferred from HospitalCreateSchema.
+ */
 export type HospitalCreateDTO = z.infer<typeof HospitalCreateSchema>;
 
+/**
+ * Schema for updating hospital information.
+ * Extends the UserUpdateSchema with additional fields.
+ * At least one field must be provided.
+ *
+ * @property {string} [website] - The website URL of the hospital (optional).
+ */
 export const HospitalUpdateSchema = UserUpdateSchema.extend({
   website: z.string().url().optional(),
 }).refine(
@@ -232,4 +250,8 @@ export const HospitalUpdateSchema = UserUpdateSchema.extend({
   }
 );
 
+/**
+ * Type definition for updating hospital information.
+ * Inferred from HospitalUpdateSchema.
+ */
 export type HospitalUpdateDTO = z.infer<typeof HospitalUpdateSchema>;
