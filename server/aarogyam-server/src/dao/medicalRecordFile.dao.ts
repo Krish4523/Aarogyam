@@ -1,4 +1,8 @@
-import { MedicalRecordFile, PrismaClient } from "@prisma/client";
+import {
+  MedicalRecordDetail,
+  MedicalRecordFile,
+  PrismaClient,
+} from "@prisma/client";
 import { MedicalRecordFileDTO } from "../types/medicalRecord.dto";
 
 const medicalRecordFileClient = new PrismaClient().medicalRecordFile;
@@ -27,6 +31,25 @@ export const deleteById = async (id: number) => {
   return medicalRecordFileClient.delete({
     where: {
       id,
+    },
+  });
+};
+
+/**
+ * Retrieves a medical record file by its ID.
+ *
+ * @param {number} id - The ID of the medical record file to retrieve.
+ * @returns {Promise<MedicalRecordDetail | null>} A promise that resolves to the retrieved medical record file, including its associated medical record.
+ */
+export const getById = async (
+  id: number
+): Promise<MedicalRecordDetail | null> => {
+  return medicalRecordFileClient.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      medicalRecord: true,
     },
   });
 };

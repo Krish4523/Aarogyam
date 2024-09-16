@@ -9,6 +9,7 @@ import {
   Doctor,
   MedicalRecord,
   MedicalRecordDetail,
+  MedicalRecordFile,
   Patient,
   Role,
   User,
@@ -91,15 +92,15 @@ export const deleteMedicalRecordDetail = async (user: SafeUser, id: number) => {
  * @returns {Promise<object>} - The result of the deletion operation.
  */
 export const deleteMedicalRecordFile = async (user: SafeUser, id: number) => {
-  const medicalRecordDetail = await medicalRecordDetailDao.getById(id);
-  if (!medicalRecordDetail) return Format.notFound("Medical Record Not found");
-  const { medicalRecord } = medicalRecordDetail as MedicalRecordDetail & {
+  const medicalRecordFile = await medicalRecordFileDao.getById(id);
+  if (!medicalRecordFile) return Format.notFound("Medical Record Not found");
+  const { medicalRecord } = medicalRecordFile as MedicalRecordFile & {
     medicalRecord: MedicalRecord;
   };
   if (!(await hasPermission(medicalRecord, user)))
     return Format.badRequest({}, "User doesn't have permission");
 
-  await medicalRecordFileDao.deleteById(medicalRecordDetail.id);
+  await medicalRecordFileDao.deleteById(medicalRecordFile.id);
   return Format.success({}, "Medical Record Deleted");
 };
 
