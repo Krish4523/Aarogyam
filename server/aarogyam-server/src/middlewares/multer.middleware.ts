@@ -15,6 +15,7 @@ if (!fs.existsSync(publicUploadDir)) {
 if (!fs.existsSync(secureUploadDir)) {
   fs.mkdirSync(secureUploadDir, { recursive: true });
 }
+
 /**
  * Multer storage configuration for handling file uploads.
  */
@@ -22,18 +23,19 @@ const storage: StorageEngine = multer.diskStorage({
   /**
    * Sets the destination directory for uploaded files.
    *
-   * @param req - The request object.
-   * @param file - The file being uploaded.
-   * @param cb - Callback function to set the destination directory.
+   * @param {Request} req - The request object.
+   * @param {Express.Multer.File} file - The file being uploaded.
+   * @param {function(Error | null, string): void} cb - Callback function to set the destination directory.
    */
   destination: (
     req: Request,
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ): void => {
-    let folder = "others";
-    const uploadDir = publicUploadDir;
+    let folder = "files";
+    let uploadDir = secureUploadDir;
     if (file.fieldname === "profileImage") {
+      uploadDir = publicUploadDir;
       folder = "profile";
     }
 
@@ -49,9 +51,9 @@ const storage: StorageEngine = multer.diskStorage({
   /**
    * Sets the filename for uploaded files.
    *
-   * @param req - The request object.
-   * @param file - The file being uploaded.
-   * @param cb - Callback function to set the filename.
+   * @param {Request} req - The request object.
+   * @param {Express.Multer.File} file - The file being uploaded.
+   * @param {function(Error | null, string): void} cb - Callback function to set the filename.
    */
   filename: (
     req: Request,

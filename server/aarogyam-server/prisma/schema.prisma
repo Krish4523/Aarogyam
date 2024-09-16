@@ -168,8 +168,9 @@ model MedicalRecord {
   id          Int      @id @default(autoincrement())
   patientId   Int
   doctorId    Int?
+  name        String
   description String?
-  recordDate  DateTime
+  recordDate  String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -178,6 +179,7 @@ model MedicalRecord {
   files   MedicalRecordFile[]
   details MedicalRecordDetail[]
 
+  @@unique([patientId, recordDate, name])
   @@index([patientId])
   @@index([doctorId])
   @@map("medical_records")
@@ -185,12 +187,13 @@ model MedicalRecord {
 
 model MedicalRecordFile {
   id              Int      @id @default(autoincrement())
+  name            String
   url             String
   medicalRecordId Int
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
 
   @@map("medical_record_files")
 }
@@ -203,9 +206,10 @@ model MedicalRecordDetail {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  medicalRecord MedicalRecord      @relation(fields: [medicalRecordId], references: [id])
-  examination   MedicalExamination @relation(fields: [examinationReferenceId], references: [id])
+  medicalRecord MedicalRecord      @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  examination   MedicalExamination @relation(fields: [examinationReferenceId], references: [id], onDelete: Restrict)
 
+  @@unique([medicalRecordId, examinationReferenceId])
   @@map("medical_record_details")
 }
 
