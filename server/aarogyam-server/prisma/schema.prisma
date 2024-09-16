@@ -84,15 +84,15 @@ model Hospital {
 
   user         User          @relation(fields: [userId], references: [id])
   doctors      Doctor[]
-  services     Services[]
+  services     Service[]
   appointments Appointment[]
 
   @@map("hospitals")
 }
 
-model Services {
+model Service {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -90,7 +90,12 @@ export async function getUserWithRole(id: number, role: Role) {
         role === Role.HOSPITAL
           ? {
               include: {
-                services: true,
+                services: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
               },
             }
           : false,

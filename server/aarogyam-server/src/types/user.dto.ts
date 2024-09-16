@@ -224,6 +224,7 @@ export const HospitalCreateSchema = z.object({
     }),
   email: z.string().email(),
   website: z.string().url().optional(),
+  services: z.string().array(),
 });
 
 /**
@@ -241,14 +242,8 @@ export type HospitalCreateDTO = z.infer<typeof HospitalCreateSchema>;
  */
 export const HospitalUpdateSchema = UserUpdateSchema.extend({
   website: z.string().url().optional(),
-}).refine(
-  (data) => {
-    return Object.values(data).some((value) => value !== undefined);
-  },
-  {
-    message: "At least one field must be provided.",
-  }
-);
+  services: z.string().array(),
+});
 
 /**
  * Type definition for updating hospital information.

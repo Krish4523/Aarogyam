@@ -29,11 +29,11 @@ router.post(
 
 /**
  * Route to get doctor details by ID.
- * Accessible by users with the HOSPITAL, DOCTORS or PATIENT role.
+ * Accessible by users with the HOSPITAL or PATIENT role.
  */
 router.get(
   "/:id",
-  verifyRole([Role.HOSPITAL, Role.PATIENT, Role.DOCTOR]),
+  verifyRole([Role.HOSPITAL, Role.PATIENT]),
   doctorController.getDoctors
 );
 

@@ -66,7 +66,7 @@ export const updateDoctor = async (
 
   if (specialtiesIds && specialtiesIds.length > 0) {
     updateData.specialties = {
-      set: specialtiesIds.map((id) => ({ id })), // This will replace the current specialties with the new ones
+      set: specialtiesIds.map((id) => ({ id })),
     };
   }
 
