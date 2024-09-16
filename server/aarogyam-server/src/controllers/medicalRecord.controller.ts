@@ -208,11 +208,10 @@ export const updateMedicalRecordDetails = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { result_ } = req.body;
     const result: any = await medicalRecordService.updateMedicalRecordDetails(
       req.user as SafeUser,
       parseInt(req.params.id, 10),
-      result_
+      req.body.result
     );
     return res.status(result.code).json(result);
   } catch (error: unknown) {
