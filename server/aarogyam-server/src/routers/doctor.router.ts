@@ -10,8 +10,7 @@ const router: Router = Router();
 router.use(verifyJWT);
 
 // medical record router (add/edit/get/(get/key))
-// Doctor router (CRUD) | Appointment Slot (CRUD)
-// admin router (add hospital)
+// Appointment Slot (CRUD)
 // appointment router (CRUD)
 
 // router.patch("", patientController.updatePatient);

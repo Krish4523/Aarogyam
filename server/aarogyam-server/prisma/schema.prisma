@@ -292,6 +292,7 @@ model MedicationTime {
 
   medication Medication @relation(fields: [medicationId], references: [id])
 
+  @@unique([time, medicationId])
   @@map("medication_times")
 }
 
@@ -324,7 +325,7 @@ model Appointment {
 model AppointmentSlot {
   id        Int             @id @default(autoincrement())
   doctorId  Int
-  date      DateTime
+  date      String
   startTime String
   endTime   String
   status    SlotStatus
