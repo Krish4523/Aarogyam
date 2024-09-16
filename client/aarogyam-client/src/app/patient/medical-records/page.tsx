@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { Calendar, ListChecks, Stethoscope } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type MedicalRecord = {
   id: number;
@@ -46,9 +47,14 @@ const MedicalRecordsPage = () => {
 
   return (
     <div className="">
-      <h1 className="text-2xl text-primary font-bold mb-4">
-        Patient Medical Records
-      </h1>
+      <div className="flex justify-between items-center my-4">
+        <h1 className="text-2xl text-primary font-bold">
+          Patient Medical Records
+        </h1>
+        <Link href="/patient/medical-records/add">
+          <Button>Add Record</Button>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {records.map((record) => (

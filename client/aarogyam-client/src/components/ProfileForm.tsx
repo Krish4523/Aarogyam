@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { profileFormSchema } from "@/utils/validations/ProfileSchema";
+import { patientProfileSchema } from "@/utils/validations/ProfileSchema";
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<typeof patientProfileSchema>;
 
 const defaultValues: ProfileFormValues = {
   name: "john_doe",
@@ -75,7 +75,7 @@ export function ProfileForm() {
   const { toast } = useToast();
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(patientProfileSchema),
     defaultValues,
     mode: "onChange",
   });

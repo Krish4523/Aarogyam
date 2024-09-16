@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -60,6 +61,7 @@ function DoctorCard({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]); // State to store fetched slots
   const { toast } = useToast();
 
   const {
@@ -76,6 +78,32 @@ function DoctorCard({
 
   const date = watch("date");
 
+  // Function to fetch available slots for the selected date
+
+  // Call fetchAppointmentSlots when the date changes
+  useEffect(() => {
+    const fetchAppointmentSlots = async (selectedDate: Date) => {
+      try {
+        const response = await axios.get(`/api/appointment/slots`, {
+          params: {
+            date: selectedDate.toISOString(),
+          },
+        });
+
+        setAvailableSlots(response.data.slots); // Assuming the response contains an array of available slots
+      } catch (error) {
+        console.error("Error fetching appointment slots:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch available slots.",
+        });
+      }
+    };
+    if (date) {
+      fetchAppointmentSlots(date);
+    }
+  }, [date, setAvailableSlots]);
+
   const onSubmit = async (data: AppointmentForm) => {
     toast({
       title: "Appointment Booked",
@@ -83,11 +111,11 @@ function DoctorCard({
     });
     await submitForm<AppointmentForm>({
       data,
-      endpoint: "/api/signup",
+      endpoint: "/api/appointments",
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {
-        console.log("Account created successfully:", response);
+        console.log("Appointment created successfully:", response);
         router.push("/patient/appointments");
       },
       onError: (error: Error) => {
@@ -131,16 +159,6 @@ function DoctorCard({
               >
                 <MapPin size={20} /> {address}
               </Link>
-              <div className="flex items-center mt-2.5">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <RatingStar
-                    key={n}
-                    fillColor={
-                      rating >= n ? "text-yellow-300" : "text-gray-200"
-                    }
-                  />
-                ))}
-              </div>
             </CardContent>
             <CardFooter>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -204,6 +222,8 @@ function DoctorCard({
                           {errors.date.message}
                         </p>
                       )}
+
+                      {/* Time Slot Selection */}
                       <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                         <label className="text-sm font-medium text-gray-700">
                           Time Slot:
@@ -214,18 +234,17 @@ function DoctorCard({
                           onValueChange={(value) => setValue("time", value)}
                           className="flex flex-wrap justify-start gap-2"
                         >
-                          <ToggleGroupItem value="09:00 AM">
-                            09:00 AM
-                          </ToggleGroupItem>
-                          <ToggleGroupItem value="11:00 AM">
-                            11:00 AM
-                          </ToggleGroupItem>
-                          <ToggleGroupItem value="01:00 PM">
-                            01:00 PM
-                          </ToggleGroupItem>
-                          <ToggleGroupItem value="03:00 PM">
-                            03:00 PM
-                          </ToggleGroupItem>
+                          {availableSlots.length > 0 ? (
+                            availableSlots.map((slot) => (
+                              <ToggleGroupItem key={slot} value={slot}>
+                                {slot}
+                              </ToggleGroupItem>
+                            ))
+                          ) : (
+                            <p className="text-gray-500 text-sm">
+                              No available slots for this date.
+                            </p>
+                          )}
                         </ToggleGroup>
                       </div>
                       {errors.time && (
@@ -233,6 +252,8 @@ function DoctorCard({
                           {errors.time.message}
                         </p>
                       )}
+
+                      {/* Notes Field */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Notes

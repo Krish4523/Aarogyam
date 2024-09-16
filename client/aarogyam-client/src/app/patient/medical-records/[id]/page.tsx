@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/form";
 
 // MedicalRecord and MedicalRecordDetail interfaces
-interface MedicalRecord {
+export interface MedicalRecord {
   id: number;
   name: string;
   description: string;
