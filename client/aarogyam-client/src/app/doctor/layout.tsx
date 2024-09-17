@@ -23,31 +23,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 
-export default function PatientLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname(); // Get the current pathname
+export default function DoctorLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
 
   // Define the sidebar items with text, icon, and route
   const sidebarItems = [
-    { text: "Dashboard", icon: <House size={24} />, href: "/patient" },
+    { text: "Dashboard", icon: <House size={24} />, href: "/doctor" },
     {
       text: "Medical Records",
       icon: <SquareLibrary size={24} />,
-      href: "/patient/medical-records",
+      href: "/doctor/medical-records",
     },
     {
       text: "Appointments",
       icon: <CalendarDays size={24} />,
-      href: "/patient/appointments",
+      href: "/doctor/appointments",
     },
     {
       text: "Medications",
       icon: <PillBottle size={24} />,
-      href: "/patient/medications",
+      href: "/doctor/medications",
     },
     {
       text: "Reminders",
       icon: <BellDot size={24} />,
-      href: "/patient/reminders",
+      href: "/doctor/reminders",
       alert: true,
     },
     {
@@ -81,7 +81,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
           <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
             {/*header bar*/}
             <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
-              <Link href="/patient">
+              <Link href="/doctor">
                 <Image
                   src="/logo.svg"
                   className="overflow-hidden transition-all delay-200"

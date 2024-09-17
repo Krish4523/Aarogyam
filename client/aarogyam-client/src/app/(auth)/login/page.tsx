@@ -21,17 +21,15 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { submitForm } from "@/utils/submitForm";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
-type LoginForm = z.infer<typeof LoginSchema>;
+export type LoginForm = z.infer<typeof LoginSchema>;
 
 function LoginPage() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // const [loading, setLoading] = useState<boolean>(false);
+  const { login, loading, errorMessage } = useAuth();
 
   const form: UseFormReturn<LoginForm> = useForm<LoginForm>({
     resolver: zodResolver(LoginSchema),
@@ -41,11 +39,11 @@ function LoginPage() {
     },
   });
 
-  const router = useRouter();
-  const { toast } = useToast();
+  // const router = useRouter();
+  // const { toast } = useToast();
 
   async function onSubmit(data: LoginForm) {
-    const isEmail = z.string().email().safeParse(data.emailOrPhone).success;
+    /*const isEmail = z.string().email().safeParse(data.emailOrPhone).success;
 
     // Create the formData object with appropriate empty fields
     const formData = {
@@ -68,7 +66,8 @@ function LoginPage() {
           description: `${error}`,
         });
       },
-    });
+    });*/
+    await login(data);
   }
 
   return (

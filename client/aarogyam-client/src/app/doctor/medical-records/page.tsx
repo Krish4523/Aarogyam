@@ -2,7 +2,7 @@
 import MedicalRecords from "@/components/MedicalRecords";
 
 const Page = () => {
-  return <MedicalRecords role="patient" />;
+  return <MedicalRecords role="doctor" />;
 };
 
 export default Page;

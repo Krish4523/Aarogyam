@@ -7,7 +7,7 @@ const Format = {
    * @param {any} [data] - Additional data to include in the response.
    * @returns {Object} The error response object.
    */
-  error: (code: number, message?: string, data?: any) => ({
+  error: (code: number, message?: string, data?: any): object => ({
     code,
     message: message || "Something went wrong",
     data: data || null,
@@ -20,7 +20,7 @@ const Format = {
    * @param {string} [message] - The success message.
    * @returns {Object} The success response object.
    */
-  success: (data: any, message?: string) => ({
+  success: (data: any, message?: string): object => ({
     code: 200,
     message: message || "OK",
     data: data || null,
@@ -32,7 +32,7 @@ const Format = {
    * @param {string} [message] - The message to include in the response.
    * @returns {Object} The no content response object.
    */
-  noContent: (message?: string) => ({
+  noContent: (message?: string): object => ({
     code: 204,
     message: message || "No Content Found",
     data: null,
@@ -45,7 +45,7 @@ const Format = {
    * @param {string} [message] - The error message.
    * @returns {Object} The bad request response object.
    */
-  badRequest: (data?: any, message?: string) => ({
+  badRequest: (data?: any, message?: string): object => ({
     code: 400,
     message: message || "Bad Request",
     data: data || null,
@@ -57,7 +57,7 @@ const Format = {
    * @param {string} [message] - The error message.
    * @returns {Object} The unauthorized response object.
    */
-  unAuthorized: (message?: string) => ({
+  unAuthorized: (message?: string): object => ({
     code: 401,
     message: message || "Unauthorized",
     data: null,
@@ -69,7 +69,7 @@ const Format = {
    * @param {string} [message] - The error message.
    * @returns {Object} The not found response object.
    */
-  notFound: (message?: string) => ({
+  notFound: (message?: string): object => ({
     code: 404,
     message: message || "Not found",
     data: null,
@@ -82,7 +82,7 @@ const Format = {
    * @param {string} [message] - The error message.
    * @returns {Object} The conflict response object.
    */
-  conflict: (data?: any, message?: string) => ({
+  conflict: (data?: any, message?: string): object => ({
     code: 409,
     message: message || "Conflict",
     data: data || null,
@@ -95,7 +95,7 @@ const Format = {
    * @param {string} [message] - The error message.
    * @returns {Object} The internal server error response object.
    */
-  internalError: (error: any, message?: string) => ({
+  internalError: (error: any, message?: string): object => ({
     code: 500,
     message: message || "Internal Server Error",
     error: `${error}`, // Explicitly cast error to string
