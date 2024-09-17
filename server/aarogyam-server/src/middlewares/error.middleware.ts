@@ -44,15 +44,14 @@ const errorMiddleware = (
 
   // Handle Prisma errors
   if (err instanceof PrismaClientKnownRequestError) {
-    res
-      .status(400)
-      .json(
-        Format.error(
-          400,
-          "A known error occurred while processing your request.",
-          prismaErrors[err.code]
-        )
-      );
+    res.status(400).json(
+      Format.error(
+        400,
+        "A known error occurred while processing your request.",
+        // @ts-ignore
+        prismaErrors[err.code]
+      )
+    );
   } else if (err instanceof PrismaClientUnknownRequestError) {
     res
       .status(500)

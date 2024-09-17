@@ -118,28 +118,6 @@ export const updateMedicalRecord = async (
 };
 
 /**
- * Retrieves a medical record by its ID, patient ID, and optionally doctor ID.
- *
- * @param {number} id - The ID of the medical record to retrieve.
- * @param {number} patientId - The ID of the patient associated with the medical record.
- * @param {number | undefined} doctorId - The ID of the doctor associated with the medical record (optional).
- * @returns {Promise<MedicalRecord | null>} A promise that resolves to the medical record if found, otherwise null.
- */
-export const getMedicalRecordByIds = async (
-  id: number,
-  patientId: number,
-  doctorId: number | undefined
-): Promise<MedicalRecord | null> => {
-  await medicalRecordClient.findUnique({
-    where: {
-      id,
-      patientId,
-      ...(doctorId !== undefined && { doctorId }),
-    },
-  });
-};
-
-/**
  * Adds a new medical record.
  *
  * @param {MedicalRecordDTO} medicalRecordData - The data for the new medical record.

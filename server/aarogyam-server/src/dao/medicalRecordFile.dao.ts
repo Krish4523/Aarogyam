@@ -43,7 +43,7 @@ export const deleteById = async (id: number) => {
  */
 export const getById = async (
   id: number
-): Promise<MedicalRecordDetail | null> => {
+): Promise<MedicalRecordDetail | null | any> => {
   return medicalRecordFileClient.findUnique({
     where: {
       id,

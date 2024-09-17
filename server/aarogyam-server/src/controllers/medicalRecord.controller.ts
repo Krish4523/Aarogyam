@@ -235,7 +235,7 @@ export const addMedicalRecord = async (
   try {
     const files: any = req.files;
 
-    const mappedFiles = files?.map((file) => ({
+    const mappedFiles = files?.map((file: any) => ({
       name: file.originalname,
       url: file.path,
     }));
