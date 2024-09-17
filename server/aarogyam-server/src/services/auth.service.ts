@@ -42,7 +42,12 @@ export const loginUser = async ({
   if (!isMatch) return Format.unAuthorized("Invalid credentials");
 
   // Generate access token for the user
-  const { accessToken } = generateTokens({ id: user.id, email: user.email });
+  const { accessToken } = generateTokens({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  });
 
   // If user exists, return success response with access token
   if (user) return Format.success(accessToken, "User login successful");
