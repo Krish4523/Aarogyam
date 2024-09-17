@@ -2,38 +2,80 @@ import multer, { StorageEngine } from "multer";
 import { Request } from "express";
 import fs from "fs";
 import path from "path";
+import { v4 as uuid } from "uuid";
 
-// Define the directory where uploads will be stored
-const uploadDir = path.join(__dirname, "../uploads");
+// Define the base upload directory
+const secureUploadDir = path.join(__dirname, "../../uploads");
+const publicUploadDir = path.join(__dirname, "../../public");
 
-// Ensure the directory exists
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Ensure the base directory exists
+if (!fs.existsSync(publicUploadDir)) {
+  fs.mkdirSync(publicUploadDir, { recursive: true });
+}
+if (!fs.existsSync(secureUploadDir)) {
+  fs.mkdirSync(secureUploadDir, { recursive: true });
 }
 
+/**
+ * Multer storage configuration for handling file uploads.
+ */
 const storage: StorageEngine = multer.diskStorage({
+  /**
+   * Sets the destination directory for uploaded files.
+   *
+   * @param {Request} req - The request object.
+   * @param {Express.Multer.File} file - The file being uploaded.
+   * @param {function(Error | null, string): void} cb - Callback function to set the destination directory.
+   */
   destination: (
     req: Request,
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ): void => {
-    // Ensure the uploads directory exists before proceeding
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    let folder = "files";
+    let uploadDir = secureUploadDir;
+    if (file.fieldname === "profileImage") {
+      uploadDir = publicUploadDir;
+      folder = "profile";
     }
-    cb(null, uploadDir);
+
+    const filePath = path.join(uploadDir, folder);
+
+    // Ensure the subdirectory exists
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath, { recursive: true });
+    }
+
+    cb(null, filePath);
   },
+  /**
+   * Sets the filename for uploaded files.
+   *
+   * @param {Request} req - The request object.
+   * @param {Express.Multer.File} file - The file being uploaded.
+   * @param {function(Error | null, string): void} cb - Callback function to set the filename.
+   */
   filename: (
     req: Request,
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void
   ): void => {
-    // Prefix the filename with the current timestamp
-    const filename = `${Date.now()}-${file.originalname}`;
-    cb(null, filename);
+    // Generate a unique UUID for the file
+    const uniqueName = uuid();
+
+    // Get the file extension (e.g., .jpg, .png)
+    const extension = path.extname(file.originalname);
+
+    // Replace spaces in the original filename and append the extension
+    const sanitizedFilename = `${uniqueName}${extension}`;
+
+    cb(null, sanitizedFilename); // Save as unique name with UUID
   },
 });
 
+/**
+ * Multer middleware for handling file uploads.
+ */
 const upload = multer({ storage });
 
 export default upload;

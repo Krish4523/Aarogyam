@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware";
 import * as userController from "../controllers/user.controller";
-import upload from "../middlewares/multer.middleware";
 
 const router: Router = Router();
 
@@ -25,18 +24,4 @@ router.route("").get(userController.getUser);
  * @controller userController.changePassword
  */
 router.patch("/change-password", userController.changePassword);
-
-/**
- *
- * @route PUT /updateUser/
- * @access Protected
- * @middleware upload.single("profileImage")
- * @controller userController.updateUser
- */
-router.put(
-  "/update/",
-  upload.single("profileImage"),
-  userController.updateUser
-);
-
 export default router;

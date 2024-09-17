@@ -5,64 +5,38 @@ import bcrypt from "bcrypt";
 /**
  * Changes the user's password.
  *
- * @param oldPassword - The user's current password.
- * @param password - The new password to be set.
- * @param userId - The ID of the user whose password is to be changed.
- * @returns A promise that resolves to the result of the password change operation.
+ * @param {string} oldPassword - The user's current password.
+ * @param {string} password - The new password to be set.
+ * @param {number} userId - The ID of the user whose password is to be changed.
+ * @returns {Promise<any>} A promise that resolves to the result of the password change operation.
  */
 export const changePassword = async (
   oldPassword: string,
   password: string,
   userId: number
 ): Promise<any> => {
+  // Find user by ID
   const user = await userDao.findByID(userId);
+  // If user not found, return not found response
   if (!user) {
     return Format.notFound("User not found");
   }
+  // If password or oldPassword is not provided, return bad request response
   if (!password || !oldPassword)
     return Format.badRequest(null, "All fields are required!");
 
+  // Compare provided old password with stored password
   const isMatch = await bcrypt.compare(oldPassword, user.password);
+  // If old password does not match, return unauthorized response
   if (!isMatch) {
     return Format.unAuthorized("Old password is incorrect");
   }
 
+  // Generate salt and hash the new password
   const salt = await bcrypt.genSalt(10);
   const newHashPassword = await bcrypt.hash(password, salt);
+  // Update user's password with the new hashed password
   await userDao.updatePassword(userId, newHashPassword);
+  // Return success response for password change
   return Format.success("Password changed successfully");
-};
-
-/**
- * Updates the user's information.
- *
- * @param name - The new name of the user.
- * @param phoneNumber - The new phone number of the user.
- * @param address - The new address of the user.
- * @param profileImage - The new profile image of the user.
- * @param userId - The ID of the user whose information is to be updated.
- * @returns A promise that resolves to the result of the update operation.
- */
-export const updateUser = async (
-  name: string,
-  phoneNumber: string,
-  address: string,
-  profileImage: string | null,
-  userId: number
-): Promise<any> => {
-  const existingUser = await userDao.findByID(userId);
-  if (!existingUser) {
-    return Format.notFound("User not found");
-  }
-  if (!profileImage) {
-    profileImage = existingUser.profile_image;
-  }
-  await userDao.updateUser(
-    name || existingUser.name,
-    phoneNumber || existingUser.phone,
-    address || existingUser.address,
-    profileImage,
-    userId
-  );
-  return Format.success("User update successfully");
 };

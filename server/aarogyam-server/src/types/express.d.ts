@@ -1,4 +1,4 @@
-import { SafeUser } from "./user";
+import { SafeUser } from "./user.dto";
 
 declare global {
   namespace Express {
@@ -8,7 +8,7 @@ declare global {
        *
        * @type {SafeUser | undefined}
        */
-      user?: SafeUser; // User object is appended in the middleware
+      user?: SafeUser;
     }
   }
 }
