@@ -1,4 +1,4 @@
-import { Medication, PrismaClient } from "@prisma/client";
+import { Medication, MedicineSource, PrismaClient } from "@prisma/client";
 import { MedicationDTO } from "../types/medication.dto";
 
 const medicationClient = new PrismaClient().medication;
@@ -96,6 +96,25 @@ export const upsertMedication = async (
     },
     include: {
       timesToTake: true,
+    },
+  });
+};
+
+export const createMedicationWithPrescription = async (
+  patientId: number,
+  name: string,
+  prescriptionId: number,
+  dosage: string,
+  frequency: string
+): Promise<Medication> => {
+  return medicationClient.create({
+    data: {
+      patientId, // Foreign key to Patient
+      name,
+      prescriptionId, // Foreign key to Prescription
+      dosage,
+      frequency,
+      source: MedicineSource.DOCTOR,
     },
   });
 };
