@@ -84,7 +84,7 @@ export type MedicalRecordDTO = z.infer<typeof MedicalRecordSchema>;
  * @property {number} [normalRangeEnd] - The end of the normal range for the examination (optional).
  */
 export const MedicalExaminationSchema = z.object({
-  name: z.number(),
+  name: z.string(),
   unit: z.string().optional(),
   gender: z.enum(["MALE", "FEMALE"]).optional(),
   normalRangeStart: z.number().optional(),
