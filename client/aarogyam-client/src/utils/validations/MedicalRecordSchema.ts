@@ -4,7 +4,8 @@ export const MedicalRecordSchema = z.object({
   name: z.string().min(1, "Record name is required"),
   description: z.string().optional(),
   recordDate: z.date({ required_error: "Record date is required" }),
-  doctorID: z.number({ required_error: "Doctor selection is required" }),
+  patientID: z.number().optional(),
+  doctorID: z.number().optional(),
   recordDetails: z
     .array(
       z.object({
