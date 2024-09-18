@@ -60,7 +60,7 @@ export type CreateUser = z.infer<typeof CreateUserSchema>;
 export const UserLoginSchema = z
   .object({
     email: z.string().email().optional(),
-    phone: z.string().min(10).optional(),
+    phone: z.string().optional(),
     password: z.string().min(8),
   })
   .refine((data) => data.email || data.phone, {
