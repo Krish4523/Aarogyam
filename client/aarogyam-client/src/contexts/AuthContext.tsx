@@ -1,12 +1,14 @@
 // contexts/AuthContext.tsx
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitForm } from "@/utils/submitForm";
 import { useToast } from "@/components/ui/use-toast";
 import { LoginForm } from "@/app/(auth)/login/page";
 import { SignUpForm } from "@/app/(auth)/signup/page";
+import Cookie from "js-cookie";
+import axios from "axios";
 
 interface AuthContextType {
   login: (data: LoginForm) => Promise<void>;
@@ -23,10 +25,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<any>(null);
+  const [authToken, setAuthToken] = useState<string | null>(
+    Cookie.get("Authorization") || null
+  );
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [role, setRole] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        setLoading(true);
+        if (authToken === null) throw new Error("Token not present");
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/user`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Cookie.get("Authorization")}`,
+            },
+          }
+        );
+        const userData = response.data;
+        setIsAuthenticated(true);
+        setIsAuthenticated(true);
+        setUser(userData);
+        // @ts-ignore
+        setRole(userData.role);
+        router.push("/");
+      } catch (error) {
+        setUser(null);
+        setRole(null);
+        setIsAuthenticated(false);
+        // Cookie.remove("Authorization");
+        console.log(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUser();
+  }, [authToken, router]);
+
+  useEffect(() => {
+    setAuthToken(Cookie.get("Authorization") || null);
+  }, []);
 
   const login = async (data: LoginForm) => {
     setLoading(true);
@@ -37,12 +83,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           phone: data.emailOrPhone.includes("@") ? "" : data.emailOrPhone,
           password: data.password,
         },
-        endpoint: "api/login",
+        endpoint: "auth/login",
         setLoading,
         setErrorMessage,
-        onSuccess: (response) => {
-          setUser(response.user); // Assuming response contains user data
-          router.push("/dashboard"); // Redirect to a secure page after login
+        onSuccess: async (response) => {
+          const { accessToken, ...userData } = response.data.data;
+          Cookie.set("Authorization", accessToken, { expires: 7 });
+          setIsAuthenticated(true);
+          setUser(userData);
+          // @ts-ignore
+          setRole(userData.role);
+          router.push("/");
         },
         onError: (error) => {
           toast({
@@ -53,6 +104,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     } catch (error) {
       setErrorMessage("Failed to login");
+      toast({
+        title: "Login Failed",
+        description: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -60,15 +115,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signup = async (data: SignUpForm) => {
     setLoading(true);
+    const { confirm_password, ...dataToSend } = data;
     try {
       await submitForm({
-        data,
+        data: dataToSend,
         endpoint: "auth/signup",
         setLoading,
         setErrorMessage,
         onSuccess: (response) => {
-          setUser(response.user); // Assuming response contains user data
-          router.push("/patient"); // Redirect to a secure page after signup
+          router.push("/login"); // Redirect to a secure page after signup
+          toast({
+            title: "Signup Successfully",
+            description: response.data.message,
+          });
         },
         onError: (error) => {
           toast({
@@ -81,6 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setErrorMessage("Failed to signup");
     } finally {
       setLoading(false);
+      setInterval(() => setErrorMessage(""), 5000);
     }
   };
 
@@ -91,7 +151,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ login, signup, logout, user, loading, errorMessage }}
+      value={{
+        login,
+        signup,
+        logout,
+        user,
+        loading,
+        errorMessage,
+        isAuthenticated,
+        authToken,
+        role,
+      }}
     >
       {children}
     </AuthContext.Provider>

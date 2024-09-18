@@ -30,7 +30,7 @@ export async function submitForm<T extends FormDataRecord>({
     // }
     //
     // for (const [key, value] of Array.from(formData.entries())) {
-    //   console.log(`${key}, ${value}`);
+    //   console.log(${key}, ${value});
     // }
     console.log(data);
 
@@ -49,7 +49,7 @@ export async function submitForm<T extends FormDataRecord>({
 
     // Call the onSuccess callback if provided
     if (onSuccess) {
-      onSuccess(response.data);
+      onSuccess(response);
     }
   } catch (error) {
     if (error instanceof AxiosError) {

@@ -23,13 +23,16 @@ import {
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export type LoginForm = z.infer<typeof LoginSchema>;
 
 function LoginPage() {
   // const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // const [loading, setLoading] = useState<boolean>(false);
-  const { login, loading, errorMessage } = useAuth();
+  const router = useRouter();
+  const { login, loading, errorMessage, isAuthenticated } = useAuth();
 
   const form: UseFormReturn<LoginForm> = useForm<LoginForm>({
     resolver: zodResolver(LoginSchema),
@@ -38,7 +41,10 @@ function LoginPage() {
       password: "",
     },
   });
-
+  useEffect(() => {
+    // Navigation logic here, if needed
+    if (isAuthenticated) router.push("/");
+  }, [isAuthenticated, router]);
   // const router = useRouter();
   // const { toast } = useToast();
 

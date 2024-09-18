@@ -21,9 +21,10 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface InputFieldsProps {
   name: "name" | "email" | "password" | "confirm_password" | "phone";
@@ -43,8 +44,12 @@ export type SignUpForm = z.infer<typeof SignUpSchema>;
 function SignupPage() {
   // const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // const [loading, setLoading] = useState<boolean>(false);
-  const { signup, loading, errorMessage } = useAuth();
-
+  const { signup, loading, errorMessage, isAuthenticated } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    // Navigation logic here, if needed
+    if (isAuthenticated) router.push("/");
+  }, [isAuthenticated, router]);
   const form: UseFormReturn<SignUpForm> = useForm<SignUpForm>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
