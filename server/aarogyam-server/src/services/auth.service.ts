@@ -49,8 +49,14 @@ export const loginUser = async ({
     role: user.role,
   });
 
+  const userRole = (await userDao.getUserWithRole(user.id, user.role)) as User;
+
   // If user exists, return success response with access token
-  if (user) return Format.success(accessToken, "User login successful");
+  if (user && userRole)
+    return Format.success(
+      { ...userRole, accessToken },
+      "User login successful"
+    );
 };
 
 /**
