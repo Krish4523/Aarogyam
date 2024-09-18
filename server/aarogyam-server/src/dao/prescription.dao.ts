@@ -174,6 +174,13 @@ export const getAll = async (
     where: {
       id: prescriptionId,
     },
+    include: {
+      medicines: {
+        include: {
+          timesToTake: true,
+        },
+      },
+    },
   });
 };
 
