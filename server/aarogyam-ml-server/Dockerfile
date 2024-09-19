@@ -10,7 +10,11 @@ COPY ./app /app
 # Install dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Expose port 80 (or the port you want to use)
+# Set environment variables
+ENV NVIDIA_API_KEY=your_nvidia_api_key
+ENV PINECONE_API_KEY=your_pinecone_api_key
+
+# Expose port 80
 EXPOSE 80
 
 # Command to run the FastAPI app with Uvicorn

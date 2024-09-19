@@ -1,6 +1,0 @@
-fastapi~=0.112.1
-pymongo~=4.8.0
-python-dotenv~=1.0.1
-pydantic~=2.8.2
-pyjwt~=2.6.0
-numpy~=2.1.1
