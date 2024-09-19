@@ -23,38 +23,93 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { patientProfileSchema } from "@/utils/validations/ProfileSchema";
+import axios from "axios";
 
 type ProfileFormValues = z.infer<typeof patientProfileSchema>;
-
-const defaultValues: ProfileFormValues = {
-  name: "john_doe",
-  email: "john@example.com",
-  phone: "1234567890",
-  address: "123 Main St, Anytown, USA",
-  profileImage: "/doctors1.jpeg",
-  emergencyContacts: [
-    {
-      name: "Jane Doe",
-      relation: "Sister",
-      phoneNo: "0987654321",
-    },
-    {
-      name: "John Smith",
-      relation: "Friend",
-      phoneNo: "1122334455",
-    },
-  ],
-};
 
 type ButtonSize = "default" | "sm" | "lg" | "icon" | null | undefined;
 
 export function ProfileForm() {
-  const [isEditable, setIsEditable] = useState(false); // State to manage edit mode
+  const [user, setUser] = useState<ProfileFormValues>({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    profileImage: "",
+    emergencyContacts: [],
+  });
 
+  const [isEditable, setIsEditable] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(
-    defaultValues.profileImage || null
+    user.profileImage || null
   );
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [buttonSize, setButtonSize] = useState<ButtonSize>("default");
+
+  console.log(user);
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
+            },
+          }
+        );
+        console.log(response.data);
+        const sanitizedUser = sanitizeData(response.data);
+        setUser(sanitizeData(response.data));
+        form.reset({ ...sanitizedUser, emergencyContacts: [] });
+        setImagePreview(sanitizedUser.profileImage || null);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getUserData();
+  }, [process.env.NEXT_PUBLIC_TOKEN]);
+
+  useEffect(() => {
+    const getEmergencyContact = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/emergency-contact`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
+            },
+          }
+        );
+        console.log(response.data.data);
+        setUser({
+          ...user,
+          emergencyContacts: response.data.data || [],
+        });
+
+        form.reset({
+          ...user,
+          emergencyContacts: response.data.data || [],
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getEmergencyContact();
+  }, [process.env.NEXT_PUBLIC_TOKEN]);
+
+  const sanitizeData = (data: any) => {
+    return {
+      name: data.name ?? "",
+      email: data.email ?? "",
+      phone: data.phone ?? "",
+      address: data.address ?? "",
+      profileImage: data.profileImage ?? "",
+      emergencyContacts: data.emergencyContacts || [],
+    };
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -76,7 +131,7 @@ export function ProfileForm() {
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(patientProfileSchema),
-    defaultValues,
+    defaultValues: user,
     mode: "onChange",
   });
 
@@ -96,28 +151,78 @@ export function ProfileForm() {
     if (!isEditable) return; // Prevent image change if not in edit mode
 
     const file = e.target.files?.[0];
+    console.log(file);
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
+        setImageFile(file);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  function onSubmit(data: ProfileFormValues) {
+  async function onSubmit(data: ProfileFormValues) {
     if (!isEditable) {
       setIsEditable(true);
     } else {
-      toast({
-        title: "Profile updated",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
-      });
-      setIsEditable(false);
+      try {
+        const formData = new FormData();
+
+        // Append form data
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("phone", data.phone);
+        formData.append("address", data.address);
+
+        // If an image was uploaded, append it to the formData
+        if (imageFile) {
+          formData.append("profileImage", imageFile);
+        }
+
+        console.log(formData);
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/patient`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const contactResponse = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/patient`,
+          data.emergencyContacts,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        toast({
+          title: "Profile updated",
+          description: (
+            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+              <code className="text-white">
+                {JSON.stringify(response.data, null, 2)}
+              </code>
+            </pre>
+          ),
+        });
+
+        setIsEditable(false);
+      } catch (error) {
+        console.log(error);
+        toast({
+          title: "Error",
+          description: "Failed to update profile.",
+        });
+      }
     }
   }
 
@@ -280,7 +385,7 @@ export function ProfileForm() {
                   />
                   <FormField
                     control={form.control}
-                    name={`emergencyContacts.${index}.phoneNo`}
+                    name={`emergencyContacts.${index}.phone`}
                     render={({ field }) => (
                       <FormItem className="w-full sm:w-auto flex-1">
                         <FormControl>
@@ -303,7 +408,10 @@ export function ProfileForm() {
                         variant="destructive"
                         size="icon"
                         className="self-start"
-                        onClick={() => remove(index)}
+                        onClick={() => {
+                          remove(index);
+                          console.log(field.id);
+                        }}
                         disabled={!isEditable}
                       >
                         <Trash2 size={16} />

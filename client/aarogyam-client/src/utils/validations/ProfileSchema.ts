@@ -18,7 +18,7 @@ export const patientProfileSchema = z.object({
       z.object({
         name: z.string().min(1, { message: "Name is required." }),
         relation: z.string().min(1, { message: "Relation is required." }),
-        phoneNo: z
+        phone: z
           .string()
           .min(10, { message: "Phone number must be at least 10 digits." })
           .max(15, { message: "Phone number must be less than 15 digits." }),
