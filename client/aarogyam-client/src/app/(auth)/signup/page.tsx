@@ -23,7 +23,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 import { useRouter } from "next/navigation";
 
 interface InputFieldsProps {

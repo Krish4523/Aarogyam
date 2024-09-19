@@ -1,15 +1,6 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
-import {
-  Apple,
-  BellDot,
-  CalendarDays,
-  House,
-  MessagesSquare,
-  PillBottle,
-  SquareLibrary,
-  User,
-} from "lucide-react";
+import { BellDot, House, Hospital, User } from "lucide-react";
 import { SidebarItem } from "@/components/SidebarItem";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -21,43 +12,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
-export default function PatientLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname(); // Get the current pathname
+export default function DoctorLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
 
   // Define the sidebar items with text, icon, and route
   const sidebarItems = [
-    { text: "Dashboard", icon: <House size={24} />, href: "/patient" },
+    { text: "Dashboard", icon: <House size={24} />, href: "/admin" },
     {
-      text: "Medical Records",
-      icon: <SquareLibrary size={24} />,
-      href: "/patient/medical-records",
+      text: "Hospitals",
+      icon: <Hospital size={24} />,
+      href: "/admin/hospital",
     },
     {
-      text: "Appointments",
-      icon: <CalendarDays size={24} />,
-      href: "/patient/appointments",
-    },
-    {
-      text: "Medications",
-      icon: <PillBottle size={24} />,
-      href: "/patient/medications",
-    },
-    {
-      text: "Reminders",
-      icon: <BellDot size={24} />,
-      href: "/patient/reminders",
-      alert: true,
-    },
-    {
-      text: "AI Chats",
-      icon: <MessagesSquare size={24} />,
-      href: "/patient/ai-chat",
-    },
-    {
-      text: "Food Insights",
-      icon: <Apple size={24} />,
-      href: "/patient/know-your-food",
+      text: "Medical-examinations",
+      icon: <Hospital size={24} />,
+      href: "/admin/medical-examination",
     },
   ];
 
@@ -66,13 +37,12 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
       <div className="max-h-screen flex flex-col">
         <div className="sm:grid sm:grid-cols-[auto,1fr] flex-grow-1 overflow-auto pb-[3.5rem] sm:pb-0">
           <Sidebar>
-            {sidebarItems.map(({ text, icon, href, alert }) => (
+            {sidebarItems.map(({ text, icon, href }) => (
               <Link key={text} href={href} passHref>
                 <SidebarItem
                   icon={icon}
                   text={text}
                   active={pathname === href} // Determine active state
-                  alert={alert}
                 />
               </Link>
             ))}
@@ -80,8 +50,8 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
           <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
             {/*header bar*/}
             <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
-              <Link href="/patient">
-                <img
+              <Link href="/doctor">
+                <Image
                   src="/logo.svg"
                   className="overflow-hidden transition-all delay-200"
                   width={128}
