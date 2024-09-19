@@ -21,8 +21,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function PatientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname(); // Get the current pathname
@@ -64,70 +62,68 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <ProtectedRoute requiredRole={"PATIENT"}>
-      <main>
-        <div className="max-h-screen flex flex-col">
-          <div className="sm:grid sm:grid-cols-[auto,1fr] flex-grow-1 overflow-auto pb-[3.5rem] sm:pb-0">
-            <Sidebar>
-              {sidebarItems.map(({ text, icon, href, alert }) => (
-                <Link key={text} href={href} passHref>
-                  <SidebarItem
-                    icon={icon}
-                    text={text}
-                    active={pathname === href} // Determine active state
-                    alert={alert}
+    <main>
+      <div className="max-h-screen flex flex-col">
+        <div className="sm:grid sm:grid-cols-[auto,1fr] flex-grow-1 overflow-auto pb-[3.5rem] sm:pb-0">
+          <Sidebar>
+            {sidebarItems.map(({ text, icon, href, alert }) => (
+              <Link key={text} href={href} passHref>
+                <SidebarItem
+                  icon={icon}
+                  text={text}
+                  active={pathname === href} // Determine active state
+                  alert={alert}
+                />
+              </Link>
+            ))}
+          </Sidebar>
+          <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
+            {/*header bar*/}
+            <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
+              <Link href="/patient">
+                <img
+                  src="/logo.svg"
+                  className="overflow-hidden transition-all delay-200"
+                  width={128}
+                  height={64}
+                  alt="Logo"
+                />
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <img
+                    src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-md"
                   />
-                </Link>
-              ))}
-            </Sidebar>
-            <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
-              {/*header bar*/}
-              <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
-                <Link href="/patient">
-                  <Image
-                    src="/logo.svg"
-                    className="overflow-hidden transition-all delay-200"
-                    width={128}
-                    height={64}
-                    alt="Logo"
-                  />
-                </Link>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Image
-                      src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-                      alt="User Avatar"
-                      className="w-10 h-10 rounded-md"
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {/*<DropdownMenuLabel></DropdownMenuLabel>*/}
-                    {/*<DropdownMenuSeparator />*/}
-                    <DropdownMenuItem>
-                      <Link
-                        href="/patient/profile"
-                        className="flex items-center gap-2"
-                      >
-                        <User size={16} /> Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link
-                        href="/patient/reminders"
-                        className="flex items-center gap-2"
-                      >
-                        <BellDot size={16} /> Reminders
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div className="px-8 mt-16 sm:mt-2">{children}</div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {/*<DropdownMenuLabel></DropdownMenuLabel>*/}
+                  {/*<DropdownMenuSeparator />*/}
+                  <DropdownMenuItem>
+                    <Link
+                      href="/patient/profile"
+                      className="flex items-center gap-2"
+                    >
+                      <User size={16} /> Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link
+                      href="/patient/reminders"
+                      className="flex items-center gap-2"
+                    >
+                      <BellDot size={16} /> Reminders
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
+            <div className="px-8 mt-16 sm:mt-2">{children}</div>
           </div>
-          <BottomNav />
         </div>
-      </main>
-    </ProtectedRoute>
+        <BottomNav />
+      </div>
+    </main>
   );
 }
