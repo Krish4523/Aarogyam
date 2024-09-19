@@ -24,6 +24,14 @@ export async function submitForm<T extends FormDataRecord>({
   try {
     setLoading(true);
     console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
+    // const formData = new FormData();
+    // for (const key in data) {
+    //   formData.append(key, data[key as keyof typeof data]);
+    // }
+    //
+    // for (const [key, value] of Array.from(formData.entries())) {
+    //   console.log(${key}, ${value});
+    // }
     console.log(data);
 
     // Send a POST request with the form data

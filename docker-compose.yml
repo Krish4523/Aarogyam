@@ -9,7 +9,7 @@ services:
       - app-network
 
   api-gateway:
-    build: ./server/aarogyam-api-gateway/nginx
+    build: ./server/aarogyam- api-gateway/nginx
     ports:
       - "80:80"
     volumes:
@@ -44,8 +44,22 @@ services:
     networks:
       - app-network
 
+  arrogyam-ml-db:
+    image: mongo:jammy
+    ports:
+      - '6500:27017'
+    volumes:
+      - aarogyam_ml_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+    networks:
+      - app-network
+
 volumes:
   aarogyam_data:
+  aarogyam_ml_data:
 
 networks:
   app-network:
