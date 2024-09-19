@@ -11,7 +11,7 @@ import { SignUpForm } from "@/app/(auth)/signup/page";
 /**
  * Interface representing a User object.
  */
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string;
