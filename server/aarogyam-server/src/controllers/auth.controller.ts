@@ -11,6 +11,7 @@ import Format from "../utils/format";
  * @param {NextFunction} next - The next middleware function.
  * @returns {Promise<any>} A promise that resolves to the response of the login request.
  */
+
 export const loginController = async (
   req: Request,
   res: Response,
@@ -127,6 +128,7 @@ export const sendRestPasswordMail = async (
  * @param {NextFunction} next - The next middleware function.
  * @returns {Promise<any>} A promise that resolves to the response of the password reset request.
  */
+
 export const resetPassword = async (
   req: Request,
   res: Response,

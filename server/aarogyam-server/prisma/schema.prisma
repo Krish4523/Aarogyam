@@ -81,11 +81,9 @@ model Hospital {
   website   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   user         User          @relation(fields: [userId], references: [id])
   doctors      Doctor[]
   services     Service[]
-  appointments Appointment[]
 
   @@map("hospitals")
 }
@@ -229,17 +227,19 @@ model MedicalExamination {
 }
 
 model Prescription {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  doctorId  Int
-  date      DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  patientId     Int
+  doctorId      Int // doctor id --> get from user id
+  appointmentId Int?     @unique
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  patient   Patient      @relation(fields: [patientId], references: [id])
-  doctor    Doctor       @relation(fields: [doctorId], references: [id])
-  medicines Medication[]
-  notes     String?
+  patient     Patient      @relation(fields: [patientId], references: [id])
+  doctor      Doctor       @relation(fields: [doctorId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+  medicines   Medication[] // add patient id from prescription to medicine using loop
+  notes       String?
 
   @@map("prescriptions")
 }
@@ -271,32 +271,32 @@ model MedicationTime {
 
   medication Medication @relation(fields: [medicationId], references: [id])
 
+  @@unique([time, medicationId])
   @@map("medication_times")
 }
 
 model Appointment {
-  id         Int               @id @default(autoincrement())
-  patientId  Int
-  doctorId   Int
-  hospitalId Int
-  date       DateTime
-  type       AppointmentType
-  location   String?
-  videoLink  String?
-  status     AppointmentStatus
-  notes      String?
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
+  id             Int               @id @default(autoincrement())
+  patientId      Int
+  doctorId       Int
+  date           String
+  type           AppointmentType
+  location       String?
+  prescriptionId Int?
+  videoLink      String?
+  status         AppointmentStatus
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
   patient           Patient          @relation(fields: [patientId], references: [id])
   doctor            Doctor           @relation(fields: [doctorId], references: [id])
-  hospital          Hospital         @relation(fields: [hospitalId], references: [id])
+  prescription      Prescription?
   appointmentSlot   AppointmentSlot? @relation(fields: [appointmentSlotId], references: [id])
   appointmentSlotId Int?             @unique
 
   @@index([patientId])
   @@index([doctorId])
-  @@index([hospitalId])
   @@map("appointments")
 }
 
