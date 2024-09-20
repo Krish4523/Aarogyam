@@ -24,90 +24,92 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { patientProfileSchema } from "@/utils/validations/ProfileSchema";
 import axios from "axios";
+import { useAuth, User } from "@/contexts/auth";
+import api from "@/lib/api";
+import Cookies from "js-cookie";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ProfileFormValues = z.infer<typeof patientProfileSchema>;
 
 type ButtonSize = "default" | "sm" | "lg" | "icon" | null | undefined;
 
 export function ProfileForm() {
-  const [user, setUser] = useState<ProfileFormValues>({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    profileImage: "",
-    emergencyContacts: [],
+  const { user, loading } = useAuth();
+
+  const [userProfile, setUserProfile] = useState<ProfileFormValues>({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+    profileImage: user?.profileImage || "",
+    // emergencyContacts: user?.patient?.emergencyContacts,
   });
 
   const [isEditable, setIsEditable] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(
-    user.profileImage || null
+    userProfile.profileImage || null
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [buttonSize, setButtonSize] = useState<ButtonSize>("default");
-
   console.log(user);
+  // @ts-ignore
+  // const { patient, ...userData } = user;
 
   useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/user`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
-            },
-          }
-        );
-        console.log(response.data);
-        const sanitizedUser = sanitizeData(response.data);
-        setUser(sanitizeData(response.data));
-        form.reset({ ...sanitizedUser, emergencyContacts: [] });
-        setImagePreview(sanitizedUser.profileImage || null);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    if (loading) {
+      return;
+    }
 
-    getUserData();
-  }, [process.env.NEXT_PUBLIC_TOKEN]);
+    setUserProfile({
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      address: user?.address || "",
+      profileImage: user?.profileImage || "",
+      // emergencyContacts: user?.patient?.emergencyContacts,
+      gender: user?.patient?.gender || "",
+    });
+    form.reset(userProfile);
+    setImagePreview(`http://localhost:80${userProfile.profileImage}` || null);
+  }, [user]);
 
-  useEffect(() => {
-    const getEmergencyContact = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/emergency-contact`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
-            },
-          }
-        );
-        console.log(response.data.data);
-        setUser({
-          ...user,
-          emergencyContacts: response.data.data || [],
-        });
+  // useEffect(() => {
+  //   const getEmergencyContact = async () => {
+  //     try {
+  //       const response = await api.get("emergency-contact");
+  //       console.log(response.data.data);
+  //       setUserProfile({
+  //         ...userProfile,
+  //         // emergencyContacts: response.data.data || [],
+  //       });
 
-        form.reset({
-          ...user,
-          emergencyContacts: response.data.data || [],
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getEmergencyContact();
-  }, [process.env.NEXT_PUBLIC_TOKEN]);
+  //       form.reset({
+  //         ...userProfile,
+  //         // emergencyContacts: response.data.data || [],
+  //       });
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   // getEmergencyContact();
+  // }, []);
 
-  const sanitizeData = (data: any) => {
+  const sanitizeData = (data: User) => {
+    console.log(data);
     return {
-      name: data.name ?? "",
-      email: data.email ?? "",
-      phone: data.phone ?? "",
-      address: data.address ?? "",
-      profileImage: data.profileImage ?? "",
-      emergencyContacts: data.emergencyContacts || [],
+      name: data.name || "",
+      email: data.email || "",
+      phone: data.phone || "",
+      address: data.address || "",
+      profileImage: data.profileImage || "",
+      gender: data?.patient?.gender || "",
+      // emergencyContacts: data?.patient?.emergencyContacts || [],
     };
   };
 
@@ -131,14 +133,14 @@ export function ProfileForm() {
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(patientProfileSchema),
-    defaultValues: user,
+    defaultValues: userProfile,
     mode: "onChange",
   });
 
-  const { fields, append, remove } = useFieldArray({
-    name: "emergencyContacts",
-    control: form.control,
-  });
+  // const { fields, append, remove } = useFieldArray({
+  //   name: "emergencyContacts",
+  //   control: form.control,
+  // });
 
   const handleClearChatHistory = () => {
     toast({
@@ -173,7 +175,9 @@ export function ProfileForm() {
         // Append form data
         formData.append("name", data.name);
         formData.append("email", data.email);
+        // @ts-ignore
         formData.append("phone", data.phone);
+        // @ts-ignore
         formData.append("address", data.address);
 
         // If an image was uploaded, append it to the formData
@@ -181,21 +185,18 @@ export function ProfileForm() {
           formData.append("profileImage", imageFile);
         }
 
-        console.log(formData);
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/patient`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const dataToSend = {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          profileImage: imageFile,
+        };
 
-        const contactResponse = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/patient`,
-          data.emergencyContacts,
+        console.log(dataToSend);
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}patient`,
+          dataToSend,
           {
             headers: {
               Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
@@ -203,14 +204,22 @@ export function ProfileForm() {
             },
           }
         );
+        // console.log(data.emergencyContacts);
+        // const contactResponse = await api.patch(
+        //   "emergency-contact",
+        //   data.emergencyContacts,
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        //     },
+        //   }
+        // );
 
         toast({
           title: "Profile updated",
           description: (
             <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-              <code className="text-white">
-                {JSON.stringify(response.data, null, 2)}
-              </code>
+              Profile Updated
             </pre>
           ),
         });
@@ -238,7 +247,7 @@ export function ProfileForm() {
           <div className="flex flex-col items-center gap-2">
             <div className="relative">
               <img
-                src={imagePreview || "/default-avatar.png"}
+                src={imagePreview || "/doctors1.jpeg"}
                 alt="Profile Image"
                 className="rounded-full size-32 object-cover border"
               />
@@ -323,9 +332,37 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Gender</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={!isEditable}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a gender" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Emergency Contacts */}
-          <div>
+          {/* <div>
             <div className="flex items-center justify-between mb-4">
               <FormLabel>Emergency Contacts</FormLabel>
               {isEditable && (
@@ -337,7 +374,7 @@ export function ProfileForm() {
                         variant="outline"
                         size="icon"
                         onClick={() =>
-                          append({ name: "", relation: "", phoneNo: "" })
+                          append({ id: 0, name: "", relation: "", phone: "" })
                         }
                       >
                         <UserPlus size={16} />
@@ -424,7 +461,7 @@ export function ProfileForm() {
                 </TooltipProvider>
               </div>
             ))}
-          </div>
+          </div> */}
           <div className="flex gap-4">
             <Button type="submit" size={buttonSize}>
               {isEditable ? "Update Profile" : "Edit Profile"}

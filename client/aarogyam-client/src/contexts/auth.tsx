@@ -11,7 +11,7 @@ import { SignUpForm } from "@/app/(auth)/signup/page";
 /**
  * Interface representing a User object.
  */
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string;
@@ -29,7 +29,7 @@ interface User {
             name: string;
             phone: string;
             relation: string;
-          }
+          },
         ];
       }
     | undefined;
@@ -43,7 +43,7 @@ interface User {
           {
             id: number;
             name: string;
-          }
+          },
         ];
       }
     | undefined;
@@ -55,7 +55,7 @@ interface User {
           {
             id: number;
             name: string;
-          }
+          },
         ];
       }
     | undefined;
@@ -99,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     async function loadUserFromCookies() {
       const accessToken = Cookies.get("accessToken");
+      console.log(accessToken);
       if (accessToken) {
         api.defaults.headers.Authorization = `Bearer ${accessToken}`;
         try {

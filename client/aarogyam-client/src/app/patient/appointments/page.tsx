@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,6 +31,7 @@ import { Loader2, MapPin, Hospital } from "lucide-react";
 import Link from "next/link";
 import { AppointmentSchema } from "@/utils/validations/AppointmentSchema";
 import { formatDate, formatTime } from "@/utils/formatter";
+import api from "@/lib/api";
 
 // Appointment interface
 interface Appointment {
@@ -111,6 +112,18 @@ export default function PatientAppointmentsPage() {
       prevAppointments.filter((appt) => appt !== appointment)
     );
   };
+
+  useEffect(() => {
+    const getAppointments = async () => {
+      try {
+        const response = await api.get("appointments");
+
+        setAppointments(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  });
 
   return (
     <div className="container mx-auto p-4">
