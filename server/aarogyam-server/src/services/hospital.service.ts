@@ -7,7 +7,29 @@ import {
 import * as hospitalDao from "../dao/hospital.dao";
 import * as userDao from "../dao/user.dao";
 import bcrypt from "bcrypt";
-import { Hospital, Role, User } from "@prisma/client";
+import { Hospital, Role, Service, User } from "@prisma/client";
+import { upsertService } from "../dao/services.dao";
+
+/**
+ * Retrieves the IDs of the given services.
+ *
+ * @param {string[]} services - An array of service names.
+ * @returns {Promise<number[]>} A promise that resolves to an array of service IDs.
+ */
+const getServiceIds = async (services: string[]): Promise<number[]> => {
+  // Normalize the specialties (convert to lowercase and trim any whitespace)
+  const normalizedServices = services.map((s) => s.trim().toLowerCase());
+
+  // Array to store the specialties ids
+  const servicesIds: number[] = [];
+
+  for (const service of normalizedServices) {
+    const specialtyRecord = await upsertService(service);
+    servicesIds.push(specialtyRecord.id);
+  }
+
+  return servicesIds;
+};
 
 /**
  * Creates a new hospital.
@@ -27,7 +49,7 @@ export const createHospital = async (
 
   const hashPassword = await bcrypt.hash(hospitalCreateDTO.name + "@123", 10);
 
-  const { website, ...userData } = hospitalCreateDTO;
+  const { website, services, ...userData } = hospitalCreateDTO;
 
   const user: User = await userDao.create({
     ...userData,
@@ -36,7 +58,9 @@ export const createHospital = async (
     role: Role.HOSPITAL,
   });
 
-  const hospital = await hospitalDao.create(user.id, website);
+  const serviceIds = await getServiceIds(services);
+
+  const hospital = await hospitalDao.create(user.id, website, serviceIds);
   return Format.success(hospital, "Hospital create successfully");
 };
 
@@ -68,7 +92,11 @@ export const getHospital = async (hospitalId: number): Promise<any> => {
     return Format.notFound("Hospital not found");
   }
 
-  const { user, website, id } = hospital as Hospital & { user: User };
+  const { user, services, website, id } = hospital as Hospital & {
+    user: User;
+  } & {
+    services: Service[];
+  };
   const { name, email, phone, address, profileImage } = user as SafeUser;
   return Format.success({
     id,
@@ -78,6 +106,7 @@ export const getHospital = async (hospitalId: number): Promise<any> => {
     address,
     profileImage,
     website,
+    services,
   });
 };
 
@@ -97,11 +126,13 @@ export const updateHospital = async (
     return Format.notFound("Hospital not found");
   }
 
-  const { website, ...userData } = hospitalData;
+  const { website, services, ...userData } = hospitalData;
 
   if (userData) await userDao.updateUser(userId, userData);
 
-  if (website) await hospitalDao.updateHospital(userId, website);
+  const serviceIds = await getServiceIds(services);
+
+  await hospitalDao.updateHospital(userId, website, serviceIds);
 
   const updatedUser = await userDao.getUserWithRole(userId, Role.HOSPITAL);
 

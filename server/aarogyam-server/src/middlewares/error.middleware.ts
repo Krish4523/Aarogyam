@@ -6,7 +6,8 @@ import {
   PrismaClientRustPanicError,
   PrismaClientUnknownRequestError,
   PrismaClientValidationError,
-} from "@prisma/client/runtime/library"; // Adjust the import path as needed
+} from "@prisma/client/runtime/library";
+import { prismaErrors } from "../utils/prisma.errors"; // Adjust the import path as needed
 
 /**
  * Middleware to handle errors in the application.
@@ -43,15 +44,14 @@ const errorMiddleware = (
 
   // Handle Prisma errors
   if (err instanceof PrismaClientKnownRequestError) {
-    res
-      .status(400)
-      .json(
-        Format.error(
-          400,
-          "A known error occurred while processing your request.",
-          message
-        )
-      );
+    res.status(400).json(
+      Format.error(
+        400,
+        "A known error occurred while processing your request.",
+        // @ts-ignore
+        prismaErrors[err.code]
+      )
+    );
   } else if (err instanceof PrismaClientUnknownRequestError) {
     res
       .status(500)

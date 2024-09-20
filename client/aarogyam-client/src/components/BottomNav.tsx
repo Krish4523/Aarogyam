@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Apple,
   CalendarDays,
   CircleEllipsis,
   House,
@@ -23,25 +24,22 @@ function BottomNav() {
       <ul className="flex flex-row justify-around items-center bg-transparent w-full">
         <li className="flex items-center">
           <Link href="/patient/">
-            <House size={24} /> {/*Dashboard*/}
+            <House size={24} />
           </Link>
         </li>
         <li className="flex items-center">
           <Link href="/patient/medical-records">
             <SquareLibrary size={24} />
-            {/*Medical Records*/}
           </Link>
         </li>
         <li className="flex items-center">
           <Link href="/patient/appointments">
             <CalendarDays size={24} />
-            {/*Appointments*/}
           </Link>
         </li>
         <li className="flex items-center">
           <Link href="/patient/medications">
             <PillBottle size={24} />
-            {/*Medications*/}
           </Link>
         </li>
         <li className="flex items-center">
@@ -54,14 +52,20 @@ function BottomNav() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Link
-                  href="/patient/profile"
+                  href="/patient/ai-chat"
                   className="flex items-center gap-2"
                 >
                   <MessagesSquare size={16} /> AI Chats
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  href="/patient/know-your-food"
+                  className="flex items-center gap-2"
+                >
+                  <Apple size={16} /> Food Insights
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </li>

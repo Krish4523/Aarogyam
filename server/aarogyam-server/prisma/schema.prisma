@@ -81,36 +81,22 @@ model Hospital {
   website   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user     User                 @relation(fields: [userId], references: [id])
-  doctors  Doctor[]
-  services ServicesOnHospital[]
+  user         User          @relation(fields: [userId], references: [id])
+  doctors      Doctor[]
+  services     Service[]
 
   @@map("hospitals")
 }
 
-model Services {
+model Service {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  hospitals ServicesOnHospital[]
+  hospitals Hospital[]
 
   @@map("services")
-}
-
-model ServicesOnHospital {
-  hospitalId Int
-  serviceId  Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  hospital Hospital @relation(fields: [hospitalId], references: [id])
-  service  Services @relation(fields: [serviceId], references: [id])
-
-  @@id([hospitalId, serviceId])
-  @@map("hospital_services")
 }
 
 model Patient {
@@ -154,46 +140,35 @@ model Doctor {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  user             User                  @relation(fields: [userId], references: [id])
-  hospital         Hospital              @relation(fields: [hospitalId], references: [id])
+  user             User              @relation(fields: [userId], references: [id])
+  hospital         Hospital          @relation(fields: [hospitalId], references: [id])
   medicalRecords   MedicalRecord[]
   prescriptions    Prescription[]
-  specialties      SpecialtiesOnDoctor[]
+  specialties      Speciality[]
   appointments     Appointment[]
   appointmentSlots AppointmentSlot[]
 
   @@map("doctors")
 }
 
-model Specialties {
+model Speciality {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  doctors SpecialtiesOnDoctor[]
+  doctors Doctor[]
 
   @@map("specialties")
-}
-
-model SpecialtiesOnDoctor {
-  doctorId     Int
-  specialityId Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  doctor    Doctor      @relation(fields: [doctorId], references: [id])
-  specialty Specialties @relation(fields: [specialityId], references: [id])
-
-  @@id([doctorId, specialityId])
 }
 
 model MedicalRecord {
   id          Int      @id @default(autoincrement())
   patientId   Int
   doctorId    Int?
+  name        String
   description String?
-  recordDate  DateTime
+  recordDate  String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -202,6 +177,7 @@ model MedicalRecord {
   files   MedicalRecordFile[]
   details MedicalRecordDetail[]
 
+  @@unique([patientId, recordDate, name])
   @@index([patientId])
   @@index([doctorId])
   @@map("medical_records")
@@ -209,12 +185,13 @@ model MedicalRecord {
 
 model MedicalRecordFile {
   id              Int      @id @default(autoincrement())
+  name            String
   url             String
   medicalRecordId Int
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
 
   @@map("medical_record_files")
 }
@@ -227,9 +204,10 @@ model MedicalRecordDetail {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  medicalRecord MedicalRecord      @relation(fields: [medicalRecordId], references: [id])
-  examination   MedicalExamination @relation(fields: [examinationReferenceId], references: [id])
+  medicalRecord MedicalRecord      @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  examination   MedicalExamination @relation(fields: [examinationReferenceId], references: [id], onDelete: Restrict)
 
+  @@unique([medicalRecordId, examinationReferenceId])
   @@map("medical_record_details")
 }
 

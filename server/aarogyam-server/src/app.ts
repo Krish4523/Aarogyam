@@ -8,6 +8,8 @@ import emergencyContactRouter from "./routers/contact.router";
 import doctorRouter from "./routers/doctor.router";
 import hospitalRouter from "./routers/hospital.router";
 import appointmentSlotRouter from "./routers/appointmentSlot.router";
+import medicalRecordRouter from "./routers/medicalRecord.router";
+import medicalExaminationRouter from "./routers/medicalExamination.router";
 import cors from "cors";
 import env from "./configs/env";
 
@@ -40,6 +42,8 @@ app.use("/api/main_service/v1/emergency-contact", emergencyContactRouter);
 app.use("/api/main_service/v1/doctor", doctorRouter);
 app.use("/api/main_service/v1/hospital", hospitalRouter);
 app.use("/api/main_service/v1/appointment-slot", appointmentSlotRouter);
+app.use("/api/main_service/v1/medical-record", medicalRecordRouter);
+app.use("/api/main_service/v1/medical-examination", medicalExaminationRouter);
 
 app.use(errorMiddleware);
 export default app;

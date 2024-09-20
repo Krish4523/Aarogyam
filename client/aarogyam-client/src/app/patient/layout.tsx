@@ -21,7 +21,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 
 export default function PatientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname(); // Get the current pathname
@@ -56,7 +55,7 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
       href: "/patient/ai-chat",
     },
     {
-      text: "Know Your Food",
+      text: "Food Insights",
       icon: <Apple size={24} />,
       href: "/patient/know-your-food",
     },
@@ -81,8 +80,8 @@ export default function PatientLayout({ children }: { children: ReactNode }) {
           <div className="overflow-x-hidden md:px-10 lg:px-16 pb-4">
             {/*header bar*/}
             <div className="sm:hidden fixed w-full top-0 z-10 flex items-center justify-between p-2 bg-white shadow-md">
-              <Link href="/">
-                <Image
+              <Link href="/patient">
+                <img
                   src="/logo.svg"
                   className="overflow-hidden transition-all delay-200"
                   width={128}

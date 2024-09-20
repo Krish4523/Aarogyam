@@ -21,17 +21,18 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { submitForm } from "@/utils/submitForm";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/auth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-type LoginForm = z.infer<typeof LoginSchema>;
+export type LoginForm = z.infer<typeof LoginSchema>;
 
 function LoginPage() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
+  const { login, loading, errorMessage, isAuthenticated } = useAuth();
 
   const form: UseFormReturn<LoginForm> = useForm<LoginForm>({
     resolver: zodResolver(LoginSchema),
@@ -40,12 +41,15 @@ function LoginPage() {
       password: "",
     },
   });
-
-  const router = useRouter();
-  const { toast } = useToast();
+  useEffect(() => {
+    // Navigation logic here, if needed
+    if (isAuthenticated) router.push("/");
+  }, [isAuthenticated, router]);
+  // const router = useRouter();
+  // const { toast } = useToast();
 
   async function onSubmit(data: LoginForm) {
-    const isEmail = z.string().email().safeParse(data.emailOrPhone).success;
+    /*const isEmail = z.string().email().safeParse(data.emailOrPhone).success;
 
     // Create the formData object with appropriate empty fields
     const formData = {
@@ -68,7 +72,8 @@ function LoginPage() {
           description: `${error}`,
         });
       },
-    });
+    });*/
+    await login(data);
   }
 
   return (

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import env from "../configs/env";
+import { Role } from "@prisma/client";
 
 /**
  * Interface representing the payload for the JWT.
@@ -7,10 +8,14 @@ import env from "../configs/env";
  * @interface Payload
  * @property {number} id - The user ID.
  * @property {string} email - The user email.
+ * @property {string} name - The user name.
+ * @property {Role} role - The user role.
  */
 export interface Payload {
   id: number;
   email: string;
+  name: string;
+  role: Role;
 }
 
 /**

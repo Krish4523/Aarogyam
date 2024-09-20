@@ -65,9 +65,44 @@ export async function getUserWithRole(id: number, role: Role) {
       id,
     },
     include: {
-      patient: role === Role.PATIENT,
-      doctor: role === Role.DOCTOR,
-      hospital: role === Role.HOSPITAL,
+      patient:
+        role === Role.PATIENT
+          ? {
+              include: {
+                emergencyContacts: true,
+              },
+            }
+          : false,
+      doctor:
+        role === Role.DOCTOR
+          ? {
+              include: {
+                specialties: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            }
+          : false,
+      hospital:
+        role === Role.HOSPITAL
+          ? {
+              include: {
+                services: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            }
+          : false,
+      password: false,
+      isVerified: false,
+      createdAt: false,
+      updatedAt: false,
     },
   });
 }

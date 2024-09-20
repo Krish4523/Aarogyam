@@ -7,7 +7,6 @@ type FormDataRecord = Record<FormDataKey, any>;
 interface SubmitFormOptions<T extends FormDataRecord> {
   data: T;
   endpoint: string;
-  // router: AppRouterInstance;
   setLoading: Dispatch<SetStateAction<boolean>>;
   setErrorMessage: Dispatch<SetStateAction<string | null>>;
   onSuccess?: (response: any) => void; // Callback for successful submission
@@ -17,7 +16,6 @@ interface SubmitFormOptions<T extends FormDataRecord> {
 export async function submitForm<T extends FormDataRecord>({
   data,
   endpoint,
-  // router,
   setLoading,
   setErrorMessage,
   onSuccess,
@@ -25,31 +23,33 @@ export async function submitForm<T extends FormDataRecord>({
 }: SubmitFormOptions<T>) {
   try {
     setLoading(true);
-
-    const formData = new FormData();
-    for (const key in data) {
-      formData.append(key, data[key as keyof typeof data]);
-    }
-
-    for (const [key, value] of Array.from(formData.entries())) {
-      console.log(`${key}, ${value}`);
-    }
+    console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
+    // const formData = new FormData();
+    // for (const key in data) {
+    //   formData.append(key, data[key as keyof typeof data]);
+    // }
+    //
+    // for (const [key, value] of Array.from(formData.entries())) {
+    //   console.log(${key}, ${value});
+    // }
+    console.log(data);
 
     // Send a POST request with the form data
-    const response = await axios.post(endpoint, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     console.log("Form submitted successfully:", response.data);
 
     // Call the onSuccess callback if provided
     if (onSuccess) {
-      onSuccess(response.data);
-    } else {
-      // Default success behavior: redirect to dashboard
-      // router.push("/dashboard");
+      onSuccess(response);
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -71,38 +71,4 @@ export async function submitForm<T extends FormDataRecord>({
   } finally {
     setLoading(false);
   }
-  /*try {
-     setLoading(true);
-     const formData = new FormData();
-     for (const key in data) {
-       formData.append(key, data[key as keyof typeof data]);
-     }
-     for (const [key, value] of Array.from(formData.entries())) {
-       console.log(`${key}, ${value}`);
-     }
-     // Send a POST request with the form data
-     const response = await axios.post("/api/signup", formData, {
-       headers: {
-         "Content-Type": "multipart/form-data",
-       },
-     });
-
-     console.log("Account created successfully:", response.data);
-     router.push("/dashboard");
-   } catch (error) {
-     if (error instanceof AxiosError) {
-       // Handle Axios error
-       const message =
-         error.response?.data?.message ||
-         "An unexpected error occurred during signup.";
-       setErrorMessage(message);
-       console.error("Error creating account:", message);
-     } else {
-       // Handle other errors
-       setErrorMessage("An unexpected error occurred.");
-       console.error("Error creating account:", error);
-     }
-   } finally {
-     setLoading(false);
-   }*/
 }
