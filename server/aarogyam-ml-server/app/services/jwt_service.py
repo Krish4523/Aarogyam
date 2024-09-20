@@ -1,9 +1,11 @@
 import os
 
 import jwt
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
+load_dotenv()
 # Define the OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET")
