@@ -6,8 +6,6 @@ from app.services.jwt_service import verify_jwt
 router = APIRouter()
 active_connections = {}
 
-messages_collection = db.messages
-
 # Instantiate AarogyamChat
 chat = AarogyamChat()
 
@@ -38,26 +36,20 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
             print(user_message)
 
             # Save the user message in the database
-            messages_collection.insert_one({
-                "user_id": user_id_from_payload,
-                "message": user_message,
-                "type": "user",
-                "email": user_email
-            })
+
 
             # Generate AI response using chat_with_model
             ai_response, source_nodes = await chat.chat_with_model(user_message)
 
             print(ai_response)
 
-            # Persist the AI response in the database
-            messages_collection.insert_one({
+            db.message.insert_one({
                 "user_id": user_id_from_payload,
-                "message": str(ai_response),
-                "type": "ai",
+                "message": user_message,
+                "reply": str(ai_response),
                 "source_nodes": source_nodes,
-                "email": user_email
             })
+            # Persist the AI response in the database
 
             # Send AI response back to the user
             await websocket.send_text(str(ai_response))
